@@ -46,38 +46,38 @@ ML-Rec
 - **探索其他等离子体现象**（如磁场湍流或粒子加速）的检测和建模能力。
 
 
-According to Len's suggestion, I made a draft of the Abstract of the project.
-Objective:
+
+### **Objective:**
  The primary objective of this project is to leverage machine learning techniques to accurately identify the positions of X-points and O-points in magnetic reconnection events.
-Motivation:
+### **Motivation:**
  Magnetic reconnection is a critical phenomenon in astrophysics and plasma physics, playing a vital role in the conversion of magnetic energy. However, traditional detection methods struggle with large-scale three-dimensional datasets and high-turbulence environments, being both inefficient and imprecise. By applying machine learning, we aim to surpass human capabilities, enabling more efficient and accurate detection of X-points and O-points in complex data, thereby advancing research in this field.
-Methodology:
+### **Methodology:**
  The project aims to adopt a series of deep learning models, with inputs including scalar fields of magnetic and electric fields (e.g., b1, b2, b3, e1, e2, e3) and other features such as density (rho) and pressure (p). The models will be trained on labeled datasets and enhanced with dynamic adjustment and optimization strategies to improve the detection performance of X-points and O-points.
-Current Progress:
+### **Current Progress:**
  The initial dataset has been cleaned and transformed, structured as a 5000x5000 two-dimensional grid containing multiple time-point simulation snapshots (from t=0 to t=50). Furthermore, we are currently evaluating various deep learning models (e.g., U-Net, CNN, and others) to ensure optimal performance, with preliminary training results undergoing performance evaluation.
 Plan:
-1. Short-term Goals (Months 1-2):
-- 		Data Processing: Further refine the dataset and generate higher-quality labeled samples.
-- 		Baseline Model Experiments: Conduct initial experiments with CNN, U-Net, and other mainstream deep learning models to establish performance baselines.
-- 		Evaluation Metrics: Define appropriate evaluation metrics (e.g., detection accuracy, recall, F1 score).
-1. Mid-term Goals (Months 2-4):
-- 		Model Optimization:
-- 		Introduce dynamic adjustment mechanisms (e.g., multi-task learning, physics constraints) to mainstream models.
-- 		Optimize network architecture and loss functions using domain knowledge.
-- 		Explore emerging models such as Kolmogorov-Arnold Networks.
-- 		Data Augmentation: Generate more diverse training data through techniques like rotation, cropping, and noise addition to improve model generalization.
-- 		Comprehensive Evaluation: Conduct detailed comparisons of multiple models, recording performance, inference time, and complexity.
-1. Long-term Goals (Months 4-6):
-- 		Model Deployment and Automation:
-- 		Develop automated detection tools for large-scale simulation analyses.
-- 		Validate model performance in real simulation environments and perform continuous optimization.
-- 		Academic Output: Write and prepare papers for submission to top conferences or journals (e.g., NeurIPS, JGR, or Physics of Plasmas).
-Expected Outcomes:
+### **1. Short-term Goals (Months 1-2):**
+- Data Processing: Further refine the dataset and generate higher-quality labeled samples.
+- Baseline Model Experiments: Conduct initial experiments with CNN, U-Net, and other mainstream deep learning models to establish performance baselines.
+- Evaluation Metrics: Define appropriate evaluation metrics (e.g., detection accuracy, recall, F1 score).
+### **2. Mid-term Goals (Months 2-4):**
+- Model Optimization:
+- Introduce dynamic adjustment mechanisms (e.g., multi-task learning, physics constraints) to mainstream models.
+- Optimize network architecture and loss functions using domain knowledge.
+- Explore emerging models such as Kolmogorov-Arnold Networks.
+- Data Augmentation: Generate more diverse training data through techniques like rotation, cropping, and noise addition to improve model generalization.
+- Comprehensive Evaluation: Conduct detailed comparisons of multiple models, recording performance, inference time, and complexity.
+### **3. Long-term Goals (Months 4-6):**
+- Model Deployment and Automation:
+- Develop automated detection tools for large-scale simulation analyses.
+- Validate model performance in real simulation environments and perform continuous optimization.
+- Academic Output: Write and prepare papers for submission to top conferences or journals (e.g., NeurIPS, JGR, or Physics of Plasmas).
+### **Expected Outcomes**:
 1. An efficient method for detecting X-points and O-points with significantly improved accuracy and speed.
 2. Openly available data and code, providing a reproducible experimental environment for the research community.
 3. High-impact academic publications, further advancing research on magnetic reconnection.
-Future Prospects:
+### **Future Prospects**:
  Potential extensions of this work include:
-- 		Expanding models to handle more complex spatial field structures.
-- 		Incorporating temporal modeling (e.g., Transformer or RNN) to enhance predictions of dynamic evolutionary processes.
-- 		Exploring detection and modeling capabilities for other plasma phenomena, such as magnetic turbulence or particle acceleration.
+- Expanding models to handle more complex spatial field structures.
+- Incorporating temporal modeling (e.g., Transformer or RNN) to enhance predictions of dynamic evolutionary processes.
+- Exploring detection and modeling capabilities for other plasma phenomena, such as magnetic turbulence or particle acceleration.
