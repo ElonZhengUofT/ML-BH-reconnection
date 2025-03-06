@@ -17,7 +17,7 @@ from src.utils import iou_score, pick_best_threshold
 ################################################################################
 # 绘制重连点图像
 ################################################################################
-def plot_reconnection_points(file):
+def report_reconnection_points(file):
     """
     根据输入的NPZ文件，绘制各向异性图并标记重连点。
 
@@ -70,7 +70,7 @@ def plot_reconnection_points(file):
 ################################################################################
 # 绘制预测与真实值的对比图
 ################################################################################
-def plot_comparison(preds, truth, file, epoch):
+def report_comparison(preds, truth, file, epoch):
     """
     绘制预测结果与真实标签的对比图，并保存为文件。
 
@@ -135,7 +135,7 @@ def generate_geom_seq(num_epochs):
 # 绘制gif动画中的单帧
 ################################################################################
 @gif.frame
-def plot_gif_frame(preds, truth, epoch, xmin, xmax, zmin, zmax):
+def report_gif_frame(preds, truth, epoch, xmin, xmax, zmin, zmax):
     """
     绘制一帧gif动画，显示预测结果，并标记图像坐标范围。
 
@@ -169,7 +169,7 @@ def plot_gif_frame(preds, truth, epoch, xmin, xmax, zmin, zmax):
 ################################################################################
 # 绘制训练和验证损失曲线
 ################################################################################
-def plot_loss(train_losses, val_losses, lr_history, outdir):
+def report_loss(train_losses, val_losses, lr_history, outdir):
     """
     绘制训练与验证损失曲线，并在学习率变化处添加垂直参考线。
 
