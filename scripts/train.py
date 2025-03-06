@@ -8,12 +8,7 @@ from glob import glob
 from tqdm import tqdm
 
 # 导入自定义模块和第三方包
-from src.data import NpzDataset
-from src.model import UNet
-from src.NewUnet import UNet as NewUNet
-from src.ViTUnet import ViTUnet
-from src.callbacks import EarlyStopping
-from src.utils import split_data
+from src.* import *
 from plot import plot_comparison
 from ptflops import get_model_complexity_info
 import netron
