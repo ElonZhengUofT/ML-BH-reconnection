@@ -129,7 +129,7 @@ def train(model, train_loader, device, criterion, optimizer, scheduler,
                            map_location='cpu'))
 
         # 当早停触发时退出训练循环
-        if early_stopping.early_stop:
+        if early_stopping.should_stop:
             print("Early stopping triggered, breaking training loop.")
             break
 
