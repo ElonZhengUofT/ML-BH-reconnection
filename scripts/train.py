@@ -165,11 +165,10 @@ def evaluate(model, data_loader, device, criterion, outdir, epoch, binary,
                             desc=f"Evaluating epoch {epoch}"):
             inputs = data['X'].to(device)
             labels = data['y'].to(device)
-            not_earth = data['not_earth'].to(device)
             fname = data['fname']
 
             outputs = model(inputs)
-            loss = criterion(outputs[not_earth], labels[not_earth]).item()
+            loss = criterion(outputs, labels).item()
             total_loss += loss
 
             batch_size = labels.size(0)
