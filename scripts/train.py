@@ -312,8 +312,8 @@ if __name__ == '__main__':
     # )
 
     unet = UNet(
-        down_chs=(8, 64, 128, 256),
-        up_chs=(256, 128, 64),
+        down_chs=(8, 64, 128),
+        up_chs=(128, 64),
         num_class=args.num_classes,
         retain_dim=True,
         out_sz=(args.height, args.width),
@@ -321,8 +321,8 @@ if __name__ == '__main__':
     )
 
     unet = ViTUNet(
-        down_chs=(8, 64, 128, 256),
-        up_chs=(256, 128, 64),
+        down_chs=(8, 64, 128),
+        up_chs=(128, 64),
         num_class=args.num_classes,
         retain_dim=True,
         out_sz=(args.height, args.width),
