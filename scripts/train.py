@@ -243,8 +243,8 @@ if __name__ == '__main__':
     arg_parser.add_argument('-l', '--learning-rate', default=1.e-5, type=float)
     arg_parser.add_argument('-c', '--num-classes', default=1, type=int)
     arg_parser.add_argument('-k', '--kernel-size', default=3, type=int)
-    arg_parser.add_argument('-y', '--height', default=344, type=int)
-    arg_parser.add_argument('-x', '--width', default=620, type=int)
+    arg_parser.add_argument('-y', '--height', default=5000, type=int)
+    arg_parser.add_argument('-x', '--width', default=625, type=int)
     arg_parser.add_argument('-n', '--normalize', action='store_true')
     arg_parser.add_argument('-s', '--standardize', action='store_true')
     arg_parser.add_argument('-g', '--gpus', nargs='+',
