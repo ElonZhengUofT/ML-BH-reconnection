@@ -1,8 +1,10 @@
+from pathlib import Path
+
+import numpy as np
 import torch
 from torch.utils.data import Dataset
-import numpy as np
-from pathlib import Path
-from src.utils import normalize, standardize, euclidian
+
+from src.utils.utils import normalize, standardize, euclidian
 
 
 class NPZDataset(Dataset):
@@ -35,11 +37,11 @@ class NPZDataset(Dataset):
 
         # 若启用归一化，则计算各向量的欧几里得模长
         if self.use_normalize:
-            norm_E = euclidian(sample['Ex'], sample['Ey'], sample['Ez'])
-            norm_B = euclidian(sample['Bx'], sample['By'], sample['Bz'])
+            norm_E = euclidian(sample['e1'], sample['e2'], sample['e3'])
+            norm_B = euclidian(sample['b1'], sample['b2'], sample['b3'])
             norm_dict = {
-                'E': norm_E,
-                'B': norm_B,
+                'e': norm_E,
+                'b': norm_B,
             }
 
         # 处理每个指定特征
@@ -58,9 +60,9 @@ class NPZDataset(Dataset):
 
         # 根据二值模式处理标签输出
         if self.binary_mode:
-            y = sample['labeled_domain'][np.newaxis, :, :]
+            y = sample['labels'][np.newaxis, :, :]
         else:
-            original_label = sample['labeled_domain']
+            original_label = sample['labels']
             inverse_label = np.where(original_label, 1, 0)
             y = np.stack((original_label, inverse_label))
 

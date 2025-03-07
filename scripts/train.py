@@ -6,10 +6,13 @@ import numpy as np
 import argparse
 from glob import glob
 from tqdm import tqdm
+import sys
+import os
 
 # 导入自定义模块和第三方包
-from src.* import *
-from plot import plot_comparison
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
+from src import *
+from report import report_comparison
 from ptflops import get_model_complexity_info
 import netron
 import torch.onnx
@@ -22,7 +25,7 @@ def train(model, train_loader, device, criterion, optimizer, scheduler,
     模型训练函数，遍历多个epoch进行训练和验证，自动保存最优模型，并根据验证损失调整学习率和进行早停。
 
     参数:
-      model: 待训练的模型
+      Model: 待训练的模型
       train_loader: 训练数据加载器
       device: 运行设备（'cpu' 或 'cuda'）
       criterion: 损失函数
@@ -52,10 +55,9 @@ def train(model, train_loader, device, criterion, optimizer, scheduler,
 
         # 使用 tqdm 展示训练进度
         for data in tqdm(train_loader, desc=f"Epoch {epoch}"):
-            # 从当前批次中提取输入、标签以及非地球区域的掩码
+            # 从当前批次中提取输入和标签
             inputs = data['X'].to(device)
             labels = data['y'].to(device)
-            not_earth = data['not_earth'].to(device)
 
             optimizer.zero_grad()  # 清空梯度
 
@@ -113,7 +115,7 @@ def train(model, train_loader, device, criterion, optimizer, scheduler,
         if last_lr < lr_history[lr_change_epoch]:
             lr_change_epoch = epoch
             lr_history[lr_change_epoch] = last_lr
-            print('Restoring best model weights.')
+            print('Restoring best Model weights.')
             if args.gpus:
                 model.module.load_state_dict(
                     torch.load(os.path.join(outdir, 'unet_best_epoch.pt'),
@@ -140,7 +142,7 @@ def evaluate(model, data_loader, device, criterion, outdir, epoch, binary,
     模型评估函数，用于在验证或测试阶段计算模型损失和保存预测结果。
 
     参数:
-      model: 待评估的模型
+      Model: 待评估的模型
       data_loader: 数据加载器（验证或测试数据）
       device: 运行设备（'cpu' 或 'cuda'）
       criterion: 损失函数
@@ -190,7 +192,7 @@ def evaluate(model, data_loader, device, criterion, outdir, epoch, binary,
                     preds_np = outputs[n].detach().cpu().numpy().squeeze()
                     truth_np = labels[n, 0].detach().cpu().numpy().squeeze()
                     plot_file = os.path.join(outdir, f'{fname[n]}.png')
-                    plot_comparison(preds=preds_np, truth=truth_np,
+                    report_comparison(preds=preds_np, truth=truth_np,
                                     file=plot_file, epoch=epoch)
 
                     # 将预测结果和真实标签保存为npz文件
@@ -227,7 +229,7 @@ def visualize_model(model):
 
 if __name__ == '__main__':
     # 设置PYTHONPATH环境变量
-    os.environ["PYTHONPATH"] = "/content/unet-reconnection"
+    os.environ["PYTHONPATH"] = "/content/ML-BH-reconnection"
 
     # 解析命令行参数
     arg_parser = argparse.ArgumentParser()
@@ -248,19 +250,20 @@ if __name__ == '__main__':
     arg_parser.add_argument('-g', '--gpus', nargs='+',
                             help='GPUs to run on in the form 0 1 etc.')
     arg_parser.add_argument('-w', '--num-workers', default=0, type=int)
-    arg_parser.add_argument('--velocity', action='store_true')
     arg_parser.add_argument('--rho', action='store_true')
-    arg_parser.add_argument('--anisotropy', action='store_true')
-    arg_parser.add_argument('--agyrotropy', action='store_true')
     args = arg_parser.parse_args()
-
-    print("First Checkpoint")
 
     # 确保输出目录存在
     os.makedirs(args.outdir, exist_ok=True)
 
     # 获取指定目录下所有NPZ文件，并拆分为训练、验证和测试集
-    files = glob(os.path.join(args.indir, '*.npz'))
+    script_dir = os.path.dirname(
+        os.path.abspath(__file__))  # 获取 train.py 所在的 scripts 目录
+    project_root = os.path.abspath(os.path.join(script_dir, ".."))  # 回到项目根目录
+    data_dir = os.path.join(project_root, args.indir)
+    print(f"Checking input directory: {data_dir}")
+    files = glob(os.path.join(data_dir, "*.npz"))
+    print(f'Found {len(files)} files in {args.indir}')
     train_files, val_files, test_files = split_data(files, args.file_fraction,
                                                     args.data_splits)
     print(len(train_files), 'train files:', train_files)
@@ -268,35 +271,29 @@ if __name__ == '__main__':
     print(len(test_files), 'test files:', test_files)
 
     # 定义所需特征列表
-    features = ['Bx', 'By', 'Bz', 'Ex', 'Ey', 'Ez']
-    if args.velocity:
-        features += ['vx', 'vy', 'vz']
+    features = ['b1', 'b2', 'b3', 'e1', 'e2', 'e3', 'rho', 'p']
     if args.rho:
         features += ['rho']
-    if args.anisotropy:
-        features += ['anisotropy']
-    if args.agyrotropy:
-        features += ['agyrotropy']
     print(len(features), 'features:', features)
 
     binary = args.num_classes == 1
 
     # 初始化训练、验证和测试数据集及其加载器
-    train_dataset = NpzDataset(train_files, features, args.normalize,
+    train_dataset = NPZDataset(train_files, features, args.normalize,
                                args.standardize, binary)
     train_loader = torch.utils.data.DataLoader(train_dataset,
                                                batch_size=args.batch_size,
                                                drop_last=True,
                                                num_workers=args.num_workers)
 
-    val_dataset = NpzDataset(val_files, features, args.normalize,
+    val_dataset = NPZDataset(val_files, features, args.normalize,
                              args.standardize, binary)
     val_loader = torch.utils.data.DataLoader(val_dataset,
                                              batch_size=args.batch_size,
                                              drop_last=False,
                                              num_workers=args.num_workers)
 
-    test_dataset = NpzDataset(test_files, features, args.normalize,
+    test_dataset = NPZDataset(test_files, features, args.normalize,
                               args.standardize, binary)
     test_loader = torch.utils.data.DataLoader(test_dataset,
                                               batch_size=args.batch_size,
@@ -313,17 +310,9 @@ if __name__ == '__main__':
     #             out_sz=(args.height, args.width),
     #             kernel_size=args.kernel_size
     # )
-    unet = UNet(
-        enc_chs=(len(features), 64, 128),
-        dec_chs=(128, 64),
-        num_class=args.num_classes,
-        retain_dim=True,
-        out_sz=(args.height, args.width),
-        kernel_size=args.kernel_size
-    )
 
-    unet = NewUNet(
-        down_chs=(6, 64, 128, 256),
+    unet = UNet(
+        down_chs=(8, 64, 128, 256),
         up_chs=(256, 128, 64),
         num_class=args.num_classes,
         retain_dim=True,
@@ -331,8 +320,8 @@ if __name__ == '__main__':
         kernel_size=args.kernel_size
     )
 
-    unet = ViTUnet(
-        down_chs=(6, 64, 128, 256),
+    unet = ViTUNet(
+        down_chs=(8, 64, 128, 256),
         up_chs=(256, 128, 64),
         num_class=args.num_classes,
         retain_dim=True,
@@ -369,12 +358,7 @@ if __name__ == '__main__':
 
     # 根据类别数选择损失函数（单类别使用焦点损失，多类别使用交叉熵）
     if args.num_classes == 1:
-        def focal_loss(outputs, labels, gamma=1.5, alpha=0.85):
-            return sigmoid_focal_loss(outputs, labels, alpha=alpha, gamma=gamma,
-                                      reduction="mean")
-
-
-        criterion = focal_loss
+        criterion = FocalLoss(gamma=1.5, alpha=0.85)
     else:
         criterion = torch.nn.CrossEntropyLoss()
 
@@ -395,7 +379,7 @@ if __name__ == '__main__':
     )
     print('Finished training!')
 
-    print('Evaluating best model from epoch', best_epoch)
+    print('Evaluating best Model from epoch', best_epoch)
     test_dir = os.path.join(args.outdir, 'test')
     os.makedirs(test_dir, exist_ok=True)
 

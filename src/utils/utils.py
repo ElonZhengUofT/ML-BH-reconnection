@@ -1,5 +1,5 @@
-import torch
 import numpy as np
+import torch
 
 
 def iou_score(prediction, target):
@@ -85,10 +85,10 @@ def normalize(name, feature, norms):
         归一化后的特征数组
     """
     # 判断特征名称的前缀选择对应的归一化基准
-    if name.startswith('E'):
-        max_val = np.max(norms['E'])
-    elif name.startswith('B'):
-        max_val = np.max(norms['B'])
+    if name.startswith('e'):
+        max_val = np.max(norms['e'])
+    elif name.startswith('b'):
+        max_val = np.max(norms['b'])
     else:
         max_val = np.max(feature)
     # 返回归一化结果

@@ -1,9 +1,9 @@
-from src.NewUnet import UNet
+from typing import Tuple
+
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
-from typing import Tuple
-from torchvision import transforms
+from src.Model.UNet import UNet
 
 
 # ----------------------
@@ -77,7 +77,7 @@ class PreViT(nn.Module):
         return x
 
 
-class ViTUnet(UNet):
+class ViTUNet(UNet):
     def __init__(self,
                  down_chs: Tuple[int, ...] = (6, 64, 128, 256),
                  up_chs: Tuple[int, ...] = (256, 128, 64),
@@ -102,7 +102,7 @@ class ViTUnet(UNet):
          - kernel_size: 卷积核大小（默认 3）
          - binary_class: 是否为二分类问题（默认 True）
         """
-        super(ViTUnet, self).__init__(down_chs, up_chs, num_class, retain_dim, out_sz, kernel_size)
+        super(ViTUNet, self).__init__(down_chs, up_chs, num_class, retain_dim, out_sz, kernel_size)
         # 在 Down 之前加入 PreViT 模块
         #         self.previt = PreViT(
         #             in_channels=down_chs[0],  # 输入通道数，假设与原始输入通道一致

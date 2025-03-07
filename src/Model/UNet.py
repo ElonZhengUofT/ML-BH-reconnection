@@ -1,8 +1,10 @@
+from typing import Tuple
+
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
-from typing import Tuple
 from torchvision import transforms
+
 
 class Block(nn.Module):
     def __init__(self, in_channels, out_channels, kernel_size):

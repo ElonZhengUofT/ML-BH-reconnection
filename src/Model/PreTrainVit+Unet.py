@@ -8,7 +8,7 @@ Vit = torchvision.models.vit_b_16
 
 class PreTrainVitUnet(nn.Module):
     """
-    PreTrainVitUnet model:
+    PreTrainVitUnet Model:
     - Pretrained ResNet(Resnet50) as extractor
     - Pretrained Vision Transformer (ViT-b-16) as encoder
     - UNet as decoder

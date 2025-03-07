@@ -10,8 +10,9 @@ from glob import glob
 from pathlib import Path
 import gif
 from sklearn import metrics
-import src.utils as utils
-from src.utils import iou_score, pick_best_threshold
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
+from src import *
+
 
 
 ################################################################################
