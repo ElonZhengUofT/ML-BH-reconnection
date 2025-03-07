@@ -66,7 +66,7 @@ def train(model, train_loader, device, criterion, optimizer, scheduler,
                 inputs)  # 输出形状 (batch_size, n_classes, img_cols, img_rows)
 
             # 计算仅在非地球区域的损失
-            loss = criterion(outputs[not_earth], labels[not_earth])
+            loss = criterion(outputs, labels)
             loss.backward()  # 反向传播计算梯度
             optimizer.step()  # 更新模型参数
 
