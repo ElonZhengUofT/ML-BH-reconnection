@@ -377,6 +377,8 @@ if __name__ == '__main__':
         criterion = torch.nn.CrossEntropyLoss()
     elif args.loss == 'l2':
         criterion = torch.nn.MSELoss()
+    elif args.loss == 'focall2':
+        criterion = FocalMSELoss(gamma=1.5, alpha=0.85)
 
     optimizer = torch.optim.Adam(unet.parameters(), lr=args.learning_rate,
                                  weight_decay=1.e-5)

@@ -99,13 +99,22 @@ def report_comparison(preds, truth, file, epoch):
     ax1 = fig.add_subplot(2, 1, 1)
     ax2 = fig.add_subplot(2, 1, 2)
 
-    # 展示预测结果
+    # 展示预测结果, mark groud truth reconnection points with a color won't cover the prediction
+    labeled_indices = truth.nonzero()
+    labeled_x = labeled_indices[0]
+    labeled_y = labeled_indices[1]
     c1 = ax1.imshow(preds)
+    ax1.scatter(labeled_y, labeled_x, marker='o', color='red')
     fig.colorbar(c1, ax=ax1)
     ax1.set_title(f'Preds, epoch {epoch}')
 
-    # 展示真实标签
+    # 展示真实标签, mark the reconnection points with red circles
+    labeled_indices = truth.nonzero()
+    labeled_x = labeled_indices[0]
+    labeled_y = labeled_indices[1]
     c2 = ax2.imshow(truth)
+    ax2.scatter(labeled_y, labeled_x, marker='o', color='red')
+    ax2.set_title('Truth')
     fig.colorbar(c2, ax=ax2)
     ax2.set_title('Truth')
 
