@@ -483,7 +483,7 @@ if __name__ == '__main__':
         print(f"truth is {truth}")
         # 计算Precision-Recall曲线
         precision, recall, thresholds = metrics.precision_recall_curve(truth,
-                                                                       preds)
+                                                                       preds, pos_label=1)
         d = {'precision': precision, 'recall': recall}
         np.savez(os.path.join(side_dir, 'precision_recall.npz'), **d)
 
