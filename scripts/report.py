@@ -513,21 +513,20 @@ if __name__ == '__main__':
         report_thresholds(precision, recall, thresholds, max_f1_thresh,
                           max_f2_thresh, side_dir)
 
-
     if 'dayside' in f1:
         binary_preds_f1_nightside = np.where(
             nightside_preds < f1['nightside']['threshold'], 0, 1)
         binary_preds_f1_dayside = np.where(
             dayside_preds < f1['dayside']['threshold'], 0, 1)
-        all_binary_preds_f1 = np.concatenate(
+        all_binary_preds = np.concatenate(
             (binary_preds_f1_nightside, binary_preds_f1_dayside), axis=2)
     else:
         print(
             "dayside f1 threshold not available, using nightside only for f1.")
-        all_binary_preds_f1 = np.where(
+        all_binary_preds = np.where(
             nightside_preds < f1['nightside']['threshold'], 0, 1)
 
-    report_confusion_matrix(all_binary_preds_f1.ravel(), all_truth.ravel(),
+    report_confusion_matrix(all_binary_preds.ravel(), all_truth.ravel(),
                             'f1', args.dir)
 
     if 'dayside' in f2:
@@ -535,15 +534,15 @@ if __name__ == '__main__':
             nightside_preds < f2['nightside']['threshold'], 0, 1)
         binary_preds_f2_dayside = np.where(
             dayside_preds < f2['dayside']['threshold'], 0, 1)
-        all_binary_preds_f2 = np.concatenate(
+        all_binary_preds = np.concatenate(
             (binary_preds_f2_nightside, binary_preds_f2_dayside), axis=2)
     else:
         print(
             "dayside f2 threshold not available, using nightside only for f2.")
-        all_binary_preds_f2 = np.where(
+        all_binary_preds = np.where(
             nightside_preds < f2['nightside']['threshold'], 0, 1)
 
-    report_confusion_matrix(all_binary_preds_f2.ravel(), all_truth.ravel(),
+    report_confusion_matrix(all_binary_preds.ravel(), all_truth.ravel(),
                             'f2', args.dir)
 
     ############################################################################
