@@ -6,8 +6,9 @@ class FocalMSELoss(nn.Module):
         super(FocalMSELoss, self).__init__()
         self.gamma = gamma
         self.alpha = alpha
+        self.f_weight = f_weight
 
-    def forward(self, outputs, labels, f_weight):
+    def forward(self, outputs, labels):
         return (sigmoid_focal_loss(outputs, labels, alpha=self.alpha,
-                                  gamma=self.gamma, reduction="mean") * f_weight +
-                nn.MSELoss(outputs, labels)) * (1 - f_weight)
+                                  gamma=self.gamma, reduction="mean") * self.f_weight +
+                nn.MSELoss(outputs, labels)) * (1 - self.f_weight)
