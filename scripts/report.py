@@ -481,6 +481,7 @@ if __name__ == '__main__':
         where_positive = np.where(truth == 1)
         print(f"where_positive is {where_positive}")
         print(f"truth is {truth}")
+        print(f"truth has {np.unique(truth)}")
         # 计算Precision-Recall曲线
         precision, recall, thresholds = metrics.precision_recall_curve(truth,
                                                                        preds, pos_label=1)
