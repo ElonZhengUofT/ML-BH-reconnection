@@ -475,7 +475,7 @@ if __name__ == '__main__':
         (dayside_preds.ravel(), dayside_truth.ravel(), 'dayside')
     ]:
         # if there is no positive in truth, skip
-        if not np.any(truth):
+        if len(np.where(truth == 1)[0]) == 0:
             continue
         side_dir = os.path.join(args.dir, side)
         os.makedirs(side_dir, exist_ok=True)
