@@ -101,8 +101,8 @@ def report_comparison(preds, truth, file, epoch):
 
     # 展示预测结果, mark groud truth reconnection points with a color won't cover the prediction
     labeled_indices = truth.nonzero()
-    labeled_x = labeled_indices[0]
-    labeled_y = labeled_indices[1]
+    labeled_x = labeled_indices[1]
+    labeled_y = labeled_indices[0]
     c1 = ax1.imshow(preds)
     ax1.scatter(labeled_y, labeled_x, marker='o', color='red')
     fig.colorbar(c1, ax=ax1)
@@ -110,8 +110,8 @@ def report_comparison(preds, truth, file, epoch):
 
     # 展示真实标签, mark the reconnection points with red circles
     labeled_indices = truth.nonzero()
-    labeled_x = labeled_indices[0]
-    labeled_y = labeled_indices[1]
+    labeled_x = labeled_indices[1]
+    labeled_y = labeled_indices[0]
     c2 = ax2.imshow(truth)
     ax2.scatter(labeled_y, labeled_x, marker='o', color='red')
     ax2.set_title('Truth')
