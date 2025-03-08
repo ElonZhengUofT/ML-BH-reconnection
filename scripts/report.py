@@ -474,7 +474,7 @@ if __name__ == '__main__':
         (nightside_preds.ravel(), nightside_truth.ravel(), 'nightside'),
         (dayside_preds.ravel(), dayside_truth.ravel(), 'dayside')
     ]:
-        # if there is no positive in truth, skip
+        # if there is no positive in truth, skip, and set f1 and f2 to 0
         if len(np.where(truth == 1)[0]) == 0:
             continue
         side_dir = os.path.join(args.dir, side)
@@ -513,20 +513,38 @@ if __name__ == '__main__':
         report_thresholds(precision, recall, thresholds, max_f1_thresh,
                           max_f2_thresh, side_dir)
 
-    # 拼接夜侧和日侧的二值预测结果，并绘制整体混淆矩阵
-    all_binary_preds = np.concatenate((
-        np.where(nightside_preds < f1['nightside']['threshold'], 0, 1),
-        np.where(dayside_preds < f1['dayside']['threshold'], 0, 1)
-    ), axis=2)
-    report_confusion_matrix(all_binary_preds.ravel(), all_truth.ravel(), 'f1',
-                            args.dir)
 
-    all_binary_preds = np.concatenate((
-        np.where(nightside_preds < f2['nightside']['threshold'], 0, 1),
-        np.where(dayside_preds < f2['dayside']['threshold'], 0, 1)
-    ), axis=2)
-    report_confusion_matrix(all_binary_preds.ravel(), all_truth.ravel(), 'f2',
-                            args.dir)
+    if 'dayside' in f1:
+        binary_preds_f1_nightside = np.where(
+            nightside_preds < f1['nightside']['threshold'], 0, 1)
+        binary_preds_f1_dayside = np.where(
+            dayside_preds < f1['dayside']['threshold'], 0, 1)
+        all_binary_preds_f1 = np.concatenate(
+            (binary_preds_f1_nightside, binary_preds_f1_dayside), axis=2)
+    else:
+        print(
+            "dayside f1 threshold not available, using nightside only for f1.")
+        all_binary_preds_f1 = np.where(
+            nightside_preds < f1['nightside']['threshold'], 0, 1)
+
+    report_confusion_matrix(all_binary_preds_f1.ravel(), all_truth.ravel(),
+                            'f1', args.dir)
+
+    if 'dayside' in f2:
+        binary_preds_f2_nightside = np.where(
+            nightside_preds < f2['nightside']['threshold'], 0, 1)
+        binary_preds_f2_dayside = np.where(
+            dayside_preds < f2['dayside']['threshold'], 0, 1)
+        all_binary_preds_f2 = np.concatenate(
+            (binary_preds_f2_nightside, binary_preds_f2_dayside), axis=2)
+    else:
+        print(
+            "dayside f2 threshold not available, using nightside only for f2.")
+        all_binary_preds_f2 = np.where(
+            nightside_preds < f2['nightside']['threshold'], 0, 1)
+
+    report_confusion_matrix(all_binary_preds_f2.ravel(), all_truth.ravel(),
+                            'f2', args.dir)
 
     ############################################################################
     # 绘制ROC曲线，并输出分类指标
