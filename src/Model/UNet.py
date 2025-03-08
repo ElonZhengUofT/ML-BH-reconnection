@@ -9,16 +9,6 @@ from torchvision import transforms
 class Block(nn.Module):
     def __init__(self, in_channels, out_channels, kernel_size):
         super().__init__()
-        #         self.conv = nn.Sequential(
-        #             nn.Conv2d(in_channels, out_channels, kernel_size=kernel_size,
-        #                       padding=0, stride=1),
-        #             nn.BatchNorm2d(out_channels),
-        #             nn.ReLU(inplace=True),
-        #             nn.Conv2d(out_channels, out_channels, kernel_size=kernel_size,
-        #                       padding=0, stride=1),
-        #             nn.BatchNorm2d(out_channels),
-        #             nn.ReLU(inplace=True)
-        #         )
         self.conv = nn.Sequential(
             nn.Conv2d(in_channels, out_channels, kernel_size=kernel_size,padding=0, stride=1),
             nn.BatchNorm2d(out_channels),
@@ -60,12 +50,10 @@ class Up(nn.Module):
         self.up = nn.ModuleList([nn.ConvTranspose2d(channels[i], channels[i+1],
                                                     kernel_size=2, stride=2)
                                  for i in range(len(channels)-1)])
-        # 修改2：卷积部分也使用kernel_size参数，并去除padding（设为0）
         self.conv = nn.ModuleList([Block(channels[i], channels[i+1], kernel_size)
                                    for i in range(len(channels)-1)])
 
     def center_crop(self, skip_connection, target):
-        # 修改3：用center crop方式裁剪跳跃连接，与简单版一致
         _, _, h, w = target.shape
         skip_connection = transforms.CenterCrop([h, w])(skip_connection)
         return skip_connection
@@ -93,14 +81,13 @@ class UNet(nn.Module):
                  out_sz: Tuple[int, int] = (572, 572),
                  kernel_size: int = 3):
         """
-        修改后的复杂版 UNet，其输入参数与简单版完全一致：
-         - enc_chs: Encoder 各层的通道数（默认 (3, 64, 128)）
-         - dec_chs: Decoder 各层的输出通道数（默认 (128, 64)）
-         - num_class: 输出类别数（默认 1）
-         - retain_dim: 是否通过插值调整输出尺寸到 out_sz（默认 False）
-         - out_sz: 当 retain_dim 为 True 时的输出尺寸（默认 (572,572)）
-         - kernel_size: 卷积核大小（默认 3）
-         - binary_class: 是否为二分类问题（默认 True）
+         - enc_chs: Encoder The channel number of each layer (default (3, 64, 128))
+         - dec_chs: Decoder The channel number of each layer (default (128, 64))
+         - num_class: The number of output classes (default 1)
+         - retain_dim: If the output size should be adjusted to out_sz (default False)
+         - out_sz: The output size when retain_dim is True (default (572,572))
+         - kernel_size: The size of the convolutional kernel (default 3)
+         - binary_class: If it is a binary classification problem (default True)
         """
         super(UNet, self).__init__()
         self.down = Down(down_chs, kernel_size)

@@ -249,7 +249,9 @@ if __name__ == '__main__':
     arg_parser.add_argument('-g', '--gpus', nargs='+',
                             help='GPUs to run on in the form 0 1 etc.')
     arg_parser.add_argument('-w', '--num-workers', default=0, type=int)
-    arg_parser.add_argument('--rho', action='store_true')
+    # arg_parser.add_argument('--rho', action='store_true')
+    arg_parser.add_argument('--model', default='ViTunet', type=str)
+    arg_parser.add_argument('--loss', default='focal', type=str)
     args = arg_parser.parse_args()
 
     # 确保输出目录存在
@@ -271,8 +273,6 @@ if __name__ == '__main__':
 
     # 定义所需特征列表
     features = ['b1', 'b2', 'b3', 'e1', 'e2', 'e3', 'rho', 'p']
-    if args.rho:
-        features += ['rho']
     print(len(features), 'features:', features)
 
     binary = args.num_classes == 1
@@ -309,24 +309,25 @@ if __name__ == '__main__':
     #             out_sz=(args.height, args.width),
     #             kernel_size=args.kernel_size
     # )
+    if args.model == 'UNet':
+        unet = UNet(
+            down_chs=(8, 64, 128),
+            up_chs=(128, 64),
+            num_class=args.num_classes,
+            retain_dim=True,
+            out_sz=(args.height, args.width),
+            kernel_size=args.kernel_size
+        )
 
-    unet = UNet(
-        down_chs=(8, 64, 128),
-        up_chs=(128, 64),
-        num_class=args.num_classes,
-        retain_dim=True,
-        out_sz=(args.height, args.width),
-        kernel_size=args.kernel_size
-    )
-
-    unet = ViTUNet(
-        down_chs=(8, 64, 128),
-        up_chs=(128, 64),
-        num_class=args.num_classes,
-        retain_dim=True,
-        out_sz=(args.height, args.width),
-        kernel_size=args.kernel_size
-    )
+    if args.model == 'ViTUnet':
+        unet = ViTUNet(
+            down_chs=(8, 64, 128),
+            up_chs=(128, 64),
+            num_class=args.num_classes,
+            retain_dim=True,
+            out_sz=(args.height, args.width),
+            kernel_size=args.kernel_size
+        )
 
     # visualize_model(unet)
 
@@ -360,6 +361,13 @@ if __name__ == '__main__':
         criterion = FocalLoss(gamma=1.5, alpha=0.85)
     else:
         criterion = torch.nn.CrossEntropyLoss()
+
+    if args.loss == 'focal':
+        criterion = FocalLoss(gamma=1.5, alpha=0.85)
+    elif args.loss == 'crossentropy':
+        criterion = torch.nn.CrossEntropyLoss()
+    elif args.loss == 'l2':
+        criterion = torch.nn.MSELoss()
 
     optimizer = torch.optim.Adam(unet.parameters(), lr=args.learning_rate,
                                  weight_decay=1.e-5)
