@@ -12,6 +12,7 @@ import gif
 from sklearn import metrics
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 from src import *
+from matplotlib.colors import LogNorm
 
 
 
@@ -21,40 +22,51 @@ from src import *
 def report_reconnection_points(file):
     """
     根据输入的NPZ文件，绘制各向异性图并标记重连点。
-
-    参数:
-      file: NPZ文件路径，文件中包含xmin、xmax、zmin、zmax、anisotropy以及labeled_domain等数据
-
-    返回:
-      earth_center_x: 根据x坐标数组计算出的地球中心x位置索引
-      data['xmin'], data['xmax'], data['zmin'], data['zmax']: 图像的坐标范围
     """
     # 加载数据文件
     data = np.load(file)
 
     # 创建画布，并设置图像大小
-    fig = plt.figure(figsize=(10, 6))
+    fig = plt.figure(figsize=(12,4))
 
-    # 根据anisotropy数组的尺寸构造x和z方向的坐标
-    xx = np.linspace(data['xmin'], data['xmax'], data['anisotropy'].shape[1])
-    zz = np.linspace(data['zmin'], data['zmax'], data['anisotropy'].shape[0])
+    L = 0.3
+    N_grid = 5000
+    x = np.linspace(-L / 0.6, L / 0.6, N_grid)
+    y = np.linspace(-L / 3.0, L / 3.0, N_grid)
+    X, Y = np.meshgrid(x, y, indexing="ij")
 
     # 找出标记区域的非零索引
-    labeled_indices = data['labeled_domain'].nonzero()
-    labeled_z = zz[labeled_indices[0]]
-    labeled_x = xx[labeled_indices[1]]
+    labeled_indices = data['labels'].nonzero()
+    labeled_x = x[labeled_indices[0]]
+    labeled_y = y[labeled_indices[1]]
+
+    x_min, x_max = -L / 0.6, L / 0.6
+    y_min, y_max = -L / 3.0, L / 3.0
+
+    b1 = data['b1']
+    b2 = data['b2']
+    b3 = data['b3']
+
+    B_magnitude = np.sqrt(b1 ** 2 + b2 ** 2 + b3 ** 2)
+    B_magnitude[B_magnitude <= 1e-7] = 1e-7
 
     # 添加子图，并显示anisotropy数据
     ax = fig.add_subplot()
-    c = ax.imshow(data['anisotropy'],
-                  extent=[data['xmin'], data['xmax'], data['zmin'],
-                          data['zmax']])
+
+    c = ax.imshow(
+        B_magnitude,
+        extent=[x[0], x[-1], y[0], y[-1]],
+        origin='lower',  # 保证网格 y[0] 在下
+        norm=LogNorm(vmin=1e-1, vmax=1e1),  # 你可根据数据分布调节
+        cmap='inferno',  # 或者 'viridis', 'plasma' 等
+        aspect='auto'  # 或 'equal'
+    )
 
     # 在图上标记出重连点（以红色叉号表示）
-    ax.scatter(labeled_x, labeled_z, marker='x', color='red')
+    ax.scatter(labeled_x, labeled_y, marker='o', color='red')
     ax.set_title('Pseudocolor-Anisotropy with reconnection points', fontsize=16)
-    ax.set_xlabel('x/Re', fontsize=12)
-    ax.set_ylabel('z/Re', fontsize=12)
+    ax.set_xlabel('x', fontsize=12)
+    ax.set_ylabel('y', fontsize=12)
     fig.colorbar(c, ax=ax)
 
     # 保存图像，并关闭画布释放资源
@@ -62,10 +74,9 @@ def report_reconnection_points(file):
     plt.close(fig)
 
     # 计算x方向最接近0的索引，视为地球中心x坐标
-    earth_center_x = np.argmin(np.abs(xx))
+    earth_center_x = np.argmin(np.abs(x))
 
-    return earth_center_x, data['xmin'], data['xmax'], data['zmin'], data[
-        'zmax']
+    return earth_center_x, x_min, x_max, y_min, y_max
 
 
 ################################################################################
@@ -186,13 +197,26 @@ def report_loss(train_losses, val_losses, lr_history, outdir):
     # 设置y轴使用科学计数法显示
     fmt = mpl.ticker.ScalarFormatter(useMathText=True)
     fmt.set_powerlimits((-3, 3))
-    plt.gca().yaxis.set_major_
+    plt.gca().yaxis.set_major_formatter(fmt)
 
+    # 绘制训练和验证损失曲线
+    plt.plot(x, train_losses[3:], label='Train Loss')
+    plt.plot(x, val_losses[3:], label='Validation Loss')
+
+    if lr_history:
+        ymin, ymax = plt.gca().get_ylim()
+        plt.vlines(lr_history[1:], ymin, ymax, linestyles='dashed', colors='gray')
+
+    plt.xlabel('Epoch')
+    plt.ylabel('Loss')
+    plt.legend()
+    plt.savefig(os.path.join(outdir, 'loss_curve.png'))
+    plt.close()
 
 ################################################################################
 # 绘制ROC曲线
 ################################################################################
-def plot_roc(preds, truth, outdir):
+def report_roc(preds, truth, outdir):
     """
     绘制接收者工作特征（ROC）曲线，并保存图像。
 
@@ -218,9 +242,9 @@ def plot_roc(preds, truth, outdir):
 ################################################################################
 # 绘制Precision-Recall曲线，并标记出F1和F2最佳阈值点
 ################################################################################
-def plot_precision_recall(precision, recall, max_f1_score, max_f1_index,
-                          max_f1_thresh, max_f2_score, max_f2_index,
-                          max_f2_thresh, outdir):
+def report_precision_recall(precision, recall, max_f1_score, max_f1_index,
+                            max_f1_thresh, max_f2_score, max_f2_index,
+                            max_f2_thresh, outdir):
     """
     绘制Precision-Recall曲线，同时标出F1和F2最佳分数对应的点及其阈值。
 
@@ -255,8 +279,8 @@ def plot_precision_recall(precision, recall, max_f1_score, max_f1_index,
 ################################################################################
 # 绘制不同阈值下的Precision和Recall曲线
 ################################################################################
-def plot_thresholds(precision, recall, thresholds, max_f1_thresh, max_f2_thresh,
-                    outdir):
+def report_thresholds(precision, recall, thresholds, max_f1_thresh, max_f2_thresh,
+                      outdir):
     """
     绘制阈值与Precision/Recall的关系曲线，并标出F1和F2最佳阈值位置。
 
@@ -287,7 +311,7 @@ def plot_thresholds(precision, recall, thresholds, max_f1_thresh, max_f2_thresh,
 ################################################################################
 # 绘制混淆矩阵
 ################################################################################
-def plot_confusion_matrix(binary_preds, truth, score, outdir):
+def report_confusion_matrix(binary_preds, truth, score, outdir):
     """
     根据二值预测和真实标签计算混淆矩阵，并将结果以对数尺度显示后保存。
 
@@ -369,8 +393,8 @@ if __name__ == '__main__':
     # 绘制各向异性图及重连点
     ############################################################################
     # 这里使用一个示例数据文件 'sample/data/3600.npz'
-    earth_center_x, xmin, xmax, zmin, zmax = plot_reconnection_points(
-        'sample/data/3600.npz')
+    earth_center_x, xmin, xmax, zmin, zmax = report_reconnection_points('smaller_data/data_time_0032_smaller.npz')
+
 
     ############################################################################
     # 读取元数据
@@ -391,12 +415,13 @@ if __name__ == '__main__':
             lr_history = [int(epoch) for epoch in metadata['lr_history'].keys()]
         else:
             lr_history = None
-        plot_loss(metadata['train_losses'], metadata['val_losses'], lr_history,
+        report_loss(metadata['train_losses'], metadata['val_losses'], lr_history,
                   args.dir)
 
         ############################################################################
         # 若指定生成gif动画，则按几何序列生成验证结果动画帧
         ############################################################################
+
         if args.gif:
             frames = []
             fname = Path(metadata['val_files'][0]).stem
@@ -406,7 +431,7 @@ if __name__ == '__main__':
                 data = np.load(
                     os.path.join(args.dir, 'val', str(i), f'{fname}.npz'))
                 preds, truth = data['outputs'], data['labels']
-                frame = plot_gif_frame(preds, truth, i, xmin, xmax, zmin, zmax)
+                frame = report_gif_frame(preds, truth, i, xmin, xmax, zmin, zmax)
                 frames.append(frame)
             gif.save(frames, os.path.join(args.dir, 'epochs.gif'), duration=100)
 
@@ -423,6 +448,8 @@ if __name__ == '__main__':
     for i, test_file in enumerate(test_list):
         data = np.load(test_file)
         preds, truth = data['outputs'], data['labels']
+        print(f"shape of preds: {preds.shape}")
+        print(f"shape of truth: {truth.shape}")
         if args.modeldir:
             test_plot_file = os.path.join(args.dir, 'test',
                                           Path(test_file).stem)
@@ -450,6 +477,10 @@ if __name__ == '__main__':
         side_dir = os.path.join(args.dir, side)
         os.makedirs(side_dir, exist_ok=True)
 
+        # find where is positive in truth
+        where_positive = np.where(truth == 1)
+        print(f"where_positive is {where_positive}")
+        print(f"truth is {truth}")
         # 计算Precision-Recall曲线
         precision, recall, thresholds = metrics.precision_recall_curve(truth,
                                                                        preds)
@@ -457,46 +488,46 @@ if __name__ == '__main__':
         np.savez(os.path.join(side_dir, 'precision_recall.npz'), **d)
 
         # 根据F1得分确定最佳阈值
-        max_f1_score, max_f1_index, max_f1_thresh = utils.pick_best_threshold(
+        max_f1_score, max_f1_index, max_f1_thresh = pick_best_threshold_by_f_beta(
             precision, recall, thresholds, 1)
         f1[side] = {'score': max_f1_score, 'threshold': max_f1_thresh}
         binary_preds = np.where(preds < max_f1_thresh, 0, 1)
-        plot_confusion_matrix(binary_preds, truth, 'f1', side_dir)
+        report_confusion_matrix(binary_preds, truth, 'f1', side_dir)
 
         # 根据F2得分确定最佳阈值
-        max_f2_score, max_f2_index, max_f2_thresh = utils.pick_best_threshold(
+        max_f2_score, max_f2_index, max_f2_thresh = pick_best_threshold_by_f_beta(
             precision, recall, thresholds, 2)
         f2[side] = {'score': max_f2_score, 'threshold': max_f2_thresh}
         binary_preds = np.where(preds < max_f2_thresh, 0, 1)
-        plot_confusion_matrix(binary_preds, truth, 'f2', side_dir)
+        report_confusion_matrix(binary_preds, truth, 'f2', side_dir)
 
         # 绘制Precision-Recall曲线及阈值曲线
-        plot_precision_recall(precision, recall, max_f1_score, max_f1_index,
-                              max_f1_thresh,
-                              max_f2_score, max_f2_index, max_f2_thresh,
-                              side_dir)
-        plot_thresholds(precision, recall, thresholds, max_f1_thresh,
-                        max_f2_thresh, side_dir)
+        report_precision_recall(precision, recall, max_f1_score, max_f1_index,
+                                max_f1_thresh,
+                                max_f2_score, max_f2_index, max_f2_thresh,
+                                side_dir)
+        report_thresholds(precision, recall, thresholds, max_f1_thresh,
+                          max_f2_thresh, side_dir)
 
     # 拼接夜侧和日侧的二值预测结果，并绘制整体混淆矩阵
     all_binary_preds = np.concatenate((
         np.where(nightside_preds < f1['nightside']['threshold'], 0, 1),
         np.where(dayside_preds < f1['dayside']['threshold'], 0, 1)
     ), axis=2)
-    plot_confusion_matrix(all_binary_preds.ravel(), all_truth.ravel(), 'f1',
-                          args.dir)
+    report_confusion_matrix(all_binary_preds.ravel(), all_truth.ravel(), 'f1',
+                            args.dir)
 
     all_binary_preds = np.concatenate((
         np.where(nightside_preds < f2['nightside']['threshold'], 0, 1),
         np.where(dayside_preds < f2['dayside']['threshold'], 0, 1)
     ), axis=2)
-    plot_confusion_matrix(all_binary_preds.ravel(), all_truth.ravel(), 'f2',
-                          args.dir)
+    report_confusion_matrix(all_binary_preds.ravel(), all_truth.ravel(), 'f2',
+                            args.dir)
 
     ############################################################################
     # 绘制ROC曲线，并输出分类指标
     ############################################################################
-    plot_roc(all_preds.ravel(), all_truth.ravel(), args.dir)
+    report_roc(all_preds.ravel(), all_truth.ravel(), args.dir)
     metrics_dict = evaluate_classifier(all_binary_preds.ravel(),
                                        all_truth.ravel())
     metrics_dict['F1'] = f1
