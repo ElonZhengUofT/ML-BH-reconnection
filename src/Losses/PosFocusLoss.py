@@ -3,16 +3,18 @@ import torch.nn as nn
 import torch.nn.functional as F
 import numpy as np
 from scipy.ndimage import distance_transform_edt
+from torchvision.ops import sigmoid_focal_loss
 
 class PosFocusLoss(nn.Module):
     """
     """
-    def __init__(self, reduction='mean'):
+    def __init__(self, reduction='mean', focal = True):
         super(PosFocusLoss, self).__init__()
         self.reduction = reduction
         # self.dists is a 2D list of tensors, where self.dists[b][c] is
         # the distance map of the c-th class of the b-th sample
         self.dists = None
+        self.focal = focal
 
     def forward(self, outputs, labels):
         B, C, H, W = labels.shape
@@ -36,6 +38,11 @@ class PosFocusLoss(nn.Module):
                 loss += loss_local
         if self.reduction == 'mean':
             loss /= (B * C * H * W)
+
+        if self.focal:
+            focal_loss = FocalLoss()
+            focal_loss_value = focal_loss(outputs, labels)
+            loss = loss * focal_loss_value
 
         return loss
 
