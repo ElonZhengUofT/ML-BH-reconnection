@@ -375,7 +375,7 @@ if __name__ == '__main__':
     elif args.loss == 'focall2':
         criterion = FocalMSELoss(gamma=1.5, alpha=0.85)
     elif args.loss == 'posfocus':
-        criterion = PositiveFocusLoss()
+        criterion = PosFocusLoss()
 
     optimizer = torch.optim.Adam(unet.parameters(), lr=args.learning_rate,
                                  weight_decay=1.e-5)
