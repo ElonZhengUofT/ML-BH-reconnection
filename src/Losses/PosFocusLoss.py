@@ -3,9 +3,8 @@ import torch.nn as nn
 import torch.nn.functional as F
 import numpy as np
 from scipy.ndimage import distance_transform_edt
-from Loss import Loss
 
-class PosFocusLoss(Loss):
+class PosFocusLoss(nn.Module):
     """
     """
     def __init__(self, reduction='mean'):
