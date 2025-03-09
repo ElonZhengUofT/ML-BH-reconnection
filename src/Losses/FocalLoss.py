@@ -1,7 +1,8 @@
 from torchvision.ops import sigmoid_focal_loss
 from torch import nn
+from Loss import Loss
 
-class FocalLoss(nn.Module):
+class FocalLoss(Loss):
     def __init__(self, gamma=1.5, alpha=0.85):
         super(FocalLoss, self).__init__()
         self.gamma = gamma

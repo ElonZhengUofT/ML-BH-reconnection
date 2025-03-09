@@ -299,16 +299,9 @@ if __name__ == '__main__':
                                               drop_last=False,
                                               num_workers=args.num_workers)
 
-    print("Second Checkpoint")
-
-    # 构造模型，依次使用不同的实现，最后选择ViTUnet作为最终模型
-    # unet = UNet(enc_chs=(len(features), 64, 128),
-    #             dec_chs=(128, 64),
-    #             num_class=args.num_classes,
-    #             retain_dim=True,
-    #             out_sz=(args.height, args.width),
-    #             kernel_size=args.kernel_size
-    # )
+################################################################################
+    # Choose the model based on the argument
+################################################################################
     unet = ViTUNet(
         down_chs=(8, 64, 128),
         up_chs=(128, 64),
@@ -365,11 +358,13 @@ if __name__ == '__main__':
     print('device:', device)
     unet.to(device)
 
-    # 根据类别数选择损失函数（单类别使用焦点损失，多类别使用交叉熵）
-    if args.num_classes == 1:
-        criterion = FocalLoss(gamma=1.5, alpha=0.85)
-    else:
-        criterion = torch.nn.CrossEntropyLoss()
+################################################################################
+    # Choose the loss function based on the argument
+################################################################################
+    #     if args.num_classes == 1:
+    #         criterion = FocalLoss(gamma=1.5, alpha=0.85)
+    #     else:
+    #         criterion = torch.nn.CrossEntropyLoss()
 
     if args.loss == 'focal':
         criterion = FocalLoss(gamma=1.5, alpha=0.85)
@@ -379,6 +374,8 @@ if __name__ == '__main__':
         criterion = torch.nn.MSELoss()
     elif args.loss == 'focall2':
         criterion = FocalMSELoss(gamma=1.5, alpha=0.85)
+    elif args.loss == 'posfocus':
+        criterion = PositiveFocusLoss()
 
     optimizer = torch.optim.Adam(unet.parameters(), lr=args.learning_rate,
                                  weight_decay=1.e-5)
