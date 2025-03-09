@@ -1,6 +1,6 @@
 from torchvision.ops import sigmoid_focal_loss
 from torch import nn
-from PosFocusLoss import PosFocusLoss
+from src.losses.PosFocusLoss import PosFocusLoss
 
 class PosFocal(nn.Module):
     def __init__(self, gamma=1.5, alpha=0.85):
