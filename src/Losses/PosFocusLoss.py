@@ -40,7 +40,8 @@ class PosFocusLoss(nn.Module):
             loss /= (B * C * H * W)
 
         if self.focal:
-            focal_loss = FocalLoss()
+            focal_loss = focal_loss = sigmoid_focal_loss(outputs, labels, alpha=0.85,
+                                        gamma=1.5, reduction="mean")
             focal_loss_value = focal_loss(outputs, labels)
             loss = loss * focal_loss_value
 
