@@ -379,6 +379,8 @@ if __name__ == '__main__':
                                 composition_method="sum")
     elif args.loss == 'posfocus':
         criterion = PosFocusLoss()
+    elif args.loss == 'posfocal':
+        criterion = PosFocal(gamma=1.5, alpha=0.85)
 
     optimizer = torch.optim.Adam(unet.parameters(), lr=args.learning_rate,
                                  weight_decay=1.e-5)
