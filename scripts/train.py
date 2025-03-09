@@ -374,6 +374,9 @@ if __name__ == '__main__':
         criterion = torch.nn.MSELoss()
     elif args.loss == 'focall2':
         criterion = FocalMSELoss(gamma=1.5, alpha=0.85)
+    elif args.loss == 'focall2+':
+        criterion = FocalMSELoss(gamma=1.5, alpha=0.85, f_weight=0.5,
+                                composition_method="sum")
     elif args.loss == 'posfocus':
         criterion = PosFocusLoss()
 
