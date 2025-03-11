@@ -252,6 +252,8 @@ if __name__ == '__main__':
     # arg_parser.add_argument('--rho', action='store_true')
     arg_parser.add_argument('--model', default='ViTUnet', type=str)
     arg_parser.add_argument('--loss', default='focal', type=str)
+    arg_parser.add_argument('--2DG', action='store_true',
+                            help='Enable 2D Gaussian label smoothing')
     args = arg_parser.parse_args()
 
     # 确保输出目录存在
@@ -276,6 +278,12 @@ if __name__ == '__main__':
     print(len(features), 'features:', features)
 
     binary = args.num_classes == 1
+
+
+################################################################################
+    # Enable 2D Gaussian label smoothing
+################################################################################
+    
 
     # 初始化训练、验证和测试数据集及其加载器
     train_dataset = NPZDataset(train_files, features, args.normalize,

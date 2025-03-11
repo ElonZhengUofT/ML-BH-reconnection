@@ -416,6 +416,10 @@ if __name__ == '__main__':
         metadata_path = os.path.join(args.dir, 'metadata.json')
     with open(metadata_path, 'r') as f:
         metadata = json.load(f)
+    ############################################################################
+    # Accoring to the metadata, report the args of training
+    ############################################################################
+    print(metadata['args'])
 
     ############################################################################
     # 绘制损失曲线（仅在未指定模型目录时）
@@ -458,8 +462,6 @@ if __name__ == '__main__':
     for i, test_file in enumerate(test_list):
         data = np.load(test_file)
         preds, truth = data['outputs'], data['labels']
-        print(f"shape of preds: {preds.shape}")
-        print(f"shape of truth: {truth.shape}")
         if args.modeldir:
             test_plot_file = os.path.join(args.dir, 'test',
                                           Path(test_file).stem)
@@ -492,9 +494,6 @@ if __name__ == '__main__':
 
         # find where is positive in truth
         where_positive = np.where(truth == 1)
-        print(f"where_positive is {where_positive}")
-        print(f"truth is {truth}")
-        print(f"truth has {np.unique(truth)}")
         # 计算Precision-Recall曲线
         precision, recall, thresholds = metrics.precision_recall_curve(truth,
                                                                        preds, pos_label=1)
