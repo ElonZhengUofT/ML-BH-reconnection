@@ -63,9 +63,11 @@ class NPZDataset(Dataset):
         # 根据二值模式处理标签输出
         if self.binary_mode:
             if self.gaussian_noise:
-                y = gaussianize_image(sample['labels'])[np.newaxis, :, :]
+                y_pre = sample['labels'].astype(np.float32)
+                y = gaussianize_image(y_pre)[np.newaxis, :, :]
             else:
                 y = sample['labels'][np.newaxis, :, :]
+            label = sample['labels'][np.newaxis, :, :]
         else:
             original_label = sample['labels']
             inverse_label = np.where(original_label, 1, 0)
@@ -74,5 +76,37 @@ class NPZDataset(Dataset):
         return {
             'X': torch.tensor(X, dtype=torch.float32),
             'y': torch.tensor(y, dtype=torch.float32),
+            'label': torch.tensor(label, dtype=torch.float32),
             'fname': Path(self.npz_paths[index]).stem
         }
+
+if __name__ == "__main__":
+    npz_paths = ["/Users/zhengshizhao/PycharmProjects/ML-BH-reconnection/smaller_data/data_time_0032_smaller.npz"]
+    feature_list = ['e1', 'e2', 'e3', 'b1', 'b2', 'b3', 'p', 'rho']
+    use_normalize = False
+    use_standardize = False
+    binary_mode = True
+    gaussian_noise = False
+    sample_npz = NPZDataset(npz_paths, feature_list, use_normalize, use_standardize, binary_mode, gaussian_noise)
+    # 在图像中央设置一个目标点
+    sample = sample_npz[0]['y'][0].numpy()
+
+    where_positive = np.where(sample == 1)
+    print(f"Positive labels: {len(where_positive[0])}")
+
+    import matplotlib.pyplot as plt
+    plt.imshow(sample, cmap='gray')
+    plt.show()
+
+    gaussian_noise = True
+    sample_npz = NPZDataset(npz_paths, feature_list, use_normalize, use_standardize, binary_mode, gaussian_noise)
+    # 在图像中央设置一个目标点
+    sample = sample_npz[0]['y'][0].numpy()
+
+    where_positive = np.where(sample == 1)
+    print(f"Positive labels: {len(where_positive[0])}")
+
+    import matplotlib.pyplot as plt
+    plt.imshow(sample, cmap='gray')
+    plt.show()
+
