@@ -165,8 +165,7 @@ def evaluate(model, data_loader, device, criterion, outdir, epoch, binary,
                             desc=f"Evaluating epoch {epoch}"):
             inputs = data['X'].to(device)
             truth = data['y'].to(device)
-            labels = data['labels'].to(device)
-
+            label = data['label'].to(device)
             fname = data['fname']
 
             outputs = model(inputs)
