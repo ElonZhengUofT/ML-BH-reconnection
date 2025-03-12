@@ -5,7 +5,7 @@ import torch
 from torch.utils.data import Dataset
 
 from src.utils.utils import normalize, standardize, euclidian
-from src.utils.2DGaussian import gaussianize_image
+from src.utils.TwoDGaussian import gaussianize_image
 
 
 class NPZDataset(Dataset):
