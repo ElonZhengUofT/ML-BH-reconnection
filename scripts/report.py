@@ -527,7 +527,7 @@ if __name__ == '__main__':
                                 max_f2_score, max_f2_index, max_f2_thresh,
                                 side_dir)
         report_thresholds(precision, recall, thresholds, max_f1_thresh,
-                          max_f2_thresh, best_threshold,
+                          max_f2_thresh,
                           side_dir)
 
     if 'dayside' in f1:
