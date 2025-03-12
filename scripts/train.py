@@ -196,7 +196,7 @@ def evaluate(model, data_loader, device, criterion, outdir, epoch, binary,
                                     file=plot_file, epoch=epoch)
 
                     # 将预测结果和真实标签保存为npz文件
-                    results = {'outputs': preds_np, 'label': label[n].cpu().numpy(), 'truth': truth_np}
+                    results = {'outputs': preds_np, 'labels': label[n].cpu().numpy(), 'truth': truth_np}
                     np.savez(os.path.join(outdir, f'{fname[n]}.npz'), **results)
 
             # 在进度条中显示当前批次的损失和准确率
@@ -207,11 +207,12 @@ def evaluate(model, data_loader, device, criterion, outdir, epoch, binary,
     return avg_loss
 
 
-def visualize_model(model):
+def visualize_model(model, input):
     """
     将模型导出为ONNX格式，并使用Netron进行可视化。
     """
-    x = torch.randn(1, 6, 344, 620, requires_grad=True)
+    device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+    x = input.to(device)
     modelData = "./demo.pth"
     torch.onnx.export(
         model,
@@ -343,7 +344,7 @@ if __name__ == '__main__':
             kernel_size=args.kernel_size
         )
 
-    # visualize_model(unet)
+    # visualize_model(unet, input=torch.randn(1, len(features), args.height, args.width))
 
     print("Third Checkpoint")
 
