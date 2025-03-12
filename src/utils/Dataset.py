@@ -37,9 +37,6 @@ class NPZDataset(Dataset):
         # 加载指定索引处的NPZ文件
         sample = np.load(self.npz_paths[index])
 
-        if self.gaussian_noise:
-            sample['labels'] += gaussianize_image(sample['labels'], sigma=3)
-
         # 若启用归一化，则计算各向量的欧几里得模长
         if self.use_normalize:
             norm_E = euclidian(sample['e1'], sample['e2'], sample['e3'])
@@ -65,7 +62,10 @@ class NPZDataset(Dataset):
 
         # 根据二值模式处理标签输出
         if self.binary_mode:
-            y = sample['labels'][np.newaxis, :, :]
+            if self.gaussian_noise:
+                y = gaussianize_image(sample['labels'][np.newaxis, :, :])
+            else:
+                y = sample['labels'][np.newaxis, :, :]
         else:
             original_label = sample['labels']
             inverse_label = np.where(original_label, 1, 0)
