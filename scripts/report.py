@@ -515,11 +515,11 @@ if __name__ == '__main__':
         binary_preds = np.where(preds < max_f2_thresh, 0, 1)
         report_confusion_matrix(binary_preds, truth, 'f2', side_dir)
 
-        max_tpr, max_tpr_index, best_threshold = pick_best_threshold_by_high_tpr(
-            precision, recall, thresholds, min_precision=1e-6)
-        tpr[side] = {'score': max_tpr, 'threshold': best_threshold}
-        binary_preds = np.where(preds < best_threshold, 0, 1)
-        report_confusion_matrix(binary_preds, truth, 'tpr', side_dir)
+#         max_tpr, max_tpr_index, best_threshold = pick_best_threshold_by_high_tpr(
+        #             precision, recall, thresholds, min_precision=1e-6)
+        #         tpr[side] = {'score': max_tpr, 'threshold': best_threshold}
+        #         binary_preds = np.where(preds < best_threshold, 0, 1)
+        #         report_confusion_matrix(binary_preds, truth, 'tpr', side_dir)
 
         # 绘制Precision-Recall曲线及阈值曲线
         report_precision_recall(precision, recall, max_f1_score, max_f1_index,
@@ -562,21 +562,21 @@ if __name__ == '__main__':
     report_confusion_matrix(all_binary_preds.ravel(), all_truth.ravel(),
                             'f2', args.dir)
 
-    if 'dayside' in tpr:
-        binary_preds_tpr_nightside = np.where(
-            nightside_preds < tpr['nightside']['threshold'], 0, 1)
-        binary_preds_tpr_dayside = np.where(
-            dayside_preds < tpr['dayside']['threshold'], 0, 1)
-        all_binary_preds = np.concatenate(
-            (binary_preds_tpr_nightside, binary_preds_tpr_dayside), axis=2)
-    else:
-        print(
-            "dayside tpr threshold not available, using nightside only for tpr.")
-        all_binary_preds = np.where(
-            nightside_preds < tpr['nightside']['threshold'], 0, 1)
-
-    report_confusion_matrix(all_binary_preds.ravel(), all_truth.ravel(),
-                            'tpr', args.dir)
+#     if 'dayside' in tpr:
+    #         binary_preds_tpr_nightside = np.where(
+    #             nightside_preds < tpr['nightside']['threshold'], 0, 1)
+    #         binary_preds_tpr_dayside = np.where(
+    #             dayside_preds < tpr['dayside']['threshold'], 0, 1)
+    #         all_binary_preds = np.concatenate(
+    #             (binary_preds_tpr_nightside, binary_preds_tpr_dayside), axis=2)
+    #     else:
+    #         print(
+    #             "dayside tpr threshold not available, using nightside only for tpr.")
+    #         all_binary_preds = np.where(
+    #             nightside_preds < tpr['nightside']['threshold'], 0, 1)
+    #
+    #     report_confusion_matrix(all_binary_preds.ravel(), all_truth.ravel(),
+    #                             'tpr', args.dir)
 
     ############################################################################
     # 绘制ROC曲线，并输出分类指标
