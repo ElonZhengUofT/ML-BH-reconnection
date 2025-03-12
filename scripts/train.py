@@ -297,14 +297,14 @@ if __name__ == '__main__':
                                                num_workers=args.num_workers)
 
     val_dataset = NPZDataset(val_files, features, args.normalize,
-                             args.standardize, binary)
+                             args.standardize, binary, gaussian)
     val_loader = torch.utils.data.DataLoader(val_dataset,
                                              batch_size=args.batch_size,
                                              drop_last=False,
                                              num_workers=args.num_workers)
 
     test_dataset = NPZDataset(test_files, features, args.normalize,
-                              args.standardize, binary)
+                              args.standardize, binary, gaussian)
     test_loader = torch.utils.data.DataLoader(test_dataset,
                                               batch_size=args.batch_size,
                                               drop_last=False,
