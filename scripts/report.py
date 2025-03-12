@@ -516,7 +516,7 @@ if __name__ == '__main__':
         report_confusion_matrix(binary_preds, truth, 'f2', side_dir)
 
         max_tpr, max_tpr_index, best_threshold = pick_best_threshold_by_high_tpr(
-            precision, recall, thresholds, min_precision=1e-3)
+            precision, recall, thresholds, min_precision=1e-6)
         tpr[side] = {'score': max_tpr, 'threshold': best_threshold}
         binary_preds = np.where(preds < best_threshold, 0, 1)
         report_confusion_matrix(binary_preds, truth, 'tpr', side_dir)
