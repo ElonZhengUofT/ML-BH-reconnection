@@ -5,6 +5,7 @@ import torch
 from torch.utils.data import Dataset
 
 from src.utils.utils import normalize, standardize, euclidian
+from src.utils.2DGaussian import gaussianize_image
 
 
 class NPZDataset(Dataset):
@@ -14,7 +15,7 @@ class NPZDataset(Dataset):
     """
 
     def __init__(self, npz_paths, feature_list, use_normalize, use_standardize,
-                 binary_mode):
+                 binary_mode, gaussian_noise):
         """
         :param npz_paths: NPZ文件的路径列表
         :param feature_list: 需要加载的特征名称列表
@@ -27,6 +28,7 @@ class NPZDataset(Dataset):
         self.use_normalize = use_normalize
         self.use_standardize = use_standardize
         self.binary_mode = binary_mode
+        self.gaussian_noise = gaussian_noise
 
     def __len__(self):
         return len(self.npz_paths)
@@ -34,6 +36,9 @@ class NPZDataset(Dataset):
     def __getitem__(self, index):
         # 加载指定索引处的NPZ文件
         sample = np.load(self.npz_paths[index])
+
+        if self.gaussian_noise:
+            sample['labels'] += gaussianize_image(sample['labels'], sigma=3)
 
         # 若启用归一化，则计算各向量的欧几里得模长
         if self.use_normalize:

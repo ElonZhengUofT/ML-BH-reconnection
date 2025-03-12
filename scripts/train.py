@@ -283,11 +283,14 @@ if __name__ == '__main__':
 ################################################################################
     # Enable 2D Gaussian label smoothing
 ################################################################################
-    
+    if args.2DG:
+        gaussian = True
+    else:
+        gaussian = False
 
     # 初始化训练、验证和测试数据集及其加载器
     train_dataset = NPZDataset(train_files, features, args.normalize,
-                               args.standardize, binary)
+                               args.standardize, binary, gaussian)
     train_loader = torch.utils.data.DataLoader(train_dataset,
                                                batch_size=args.batch_size,
                                                drop_last=True,
