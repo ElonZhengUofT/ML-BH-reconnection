@@ -164,38 +164,40 @@ def evaluate(model, data_loader, device, criterion, outdir, epoch, binary,
         for i, data in tqdm(enumerate(data_loader),
                             desc=f"Evaluating epoch {epoch}"):
             inputs = data['X'].to(device)
-            labels = data['y'].to(device)
+            truth = data['y'].to(device)
+            labels = data['labels'].to(device)
+
             fname = data['fname']
 
             outputs = model(inputs)
-            loss = criterion(outputs, labels).item()
+            loss = criterion(outputs, truth).item()
             total_loss += loss
 
-            batch_size = labels.size(0)
+            batch_size = truth.size(0)
             total_count += batch_size
-            width = labels.size(2)
-            height = labels.size(3)
+            width = truth.size(2)
+            height = truth.size(3)
 
             # 根据任务类型计算正确预测数
             if binary:
                 threshold_outputs = torch.where(outputs > 0.5, 1, 0)
-                correct = (threshold_outputs == labels[:, 0]).sum().item()
+                correct = (threshold_outputs == truth[:, 0]).sum().item()
             else:
                 _, outputs = outputs.max(1)  # 选择概率最大的类别
-                correct = (outputs == labels[:, 0]).sum().item()
+                correct = (outputs == truth[:, 0]).sum().item()
 
             # 对测试模式或者验证集第一个批次，保存预测与真实对比图
             if mode == 'test' or i == 0:
                 num_plots = 1 if mode == 'val' else batch_size
                 for n in range(num_plots):
                     preds_np = outputs[n].detach().cpu().numpy().squeeze()
-                    truth_np = labels[n, 0].detach().cpu().numpy().squeeze()
+                    truth_np = truth[n, 0].detach().cpu().numpy().squeeze()
                     plot_file = os.path.join(outdir, f'{fname[n]}.png')
                     report_comparison(preds=preds_np, truth=truth_np,
                                     file=plot_file, epoch=epoch)
 
                     # 将预测结果和真实标签保存为npz文件
-                    results = {'outputs': preds_np, 'labels': truth_np}
+                    results = {'outputs': preds_np, 'labels': labels[n].cpu().numpy(), truth': truth_np}
                     np.savez(os.path.join(outdir, f'{fname[n]}.npz'), **results)
 
             # 在进度条中显示当前批次的损失和准确率
