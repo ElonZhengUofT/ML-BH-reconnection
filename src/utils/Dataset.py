@@ -64,10 +64,21 @@ class NPZDataset(Dataset):
         if self.binary_mode:
             if self.gaussian_noise:
                 y_pre = sample['labels'].astype(np.float32)
+                # 交换x和y轴
+                y_pre = np.swapaxes(y_pre, 0, 1)
+                # y轴对称翻转
+                y_pre = np.flip(y_pre, axis=0)
                 y = gaussianize_image(y_pre)[np.newaxis, :, :]
             else:
-                y = sample['labels'][np.newaxis, :, :]
-            label = sample['labels'][np.newaxis, :, :]
+                y_pre = sample['labels']
+                y_pre = np.swapaxes(y_pre, 0, 1)
+                y_pre = np.flip(y_pre, axis=0).copy()
+                y = y_pre[np.newaxis, :, :]
+            label_pre = sample['labels']
+            label_pre = np.swapaxes(label_pre, 0, 1)
+            label_pre = np.flip(label_pre, axis=0).copy()
+            label = label_pre[np.newaxis, :, :]
+
         else:
             original_label = sample['labels']
             inverse_label = np.where(original_label, 1, 0)
@@ -103,7 +114,7 @@ if __name__ == "__main__":
     # 在图像中央设置一个目标点
     sample = sample_npz[0]['y'][0].numpy()
 
-    where_positive = np.where(sample == 1)
+    where_positive = np.where(sample > 0)
     print(f"Positive labels: {len(where_positive[0])}")
 
     import matplotlib.pyplot as plt

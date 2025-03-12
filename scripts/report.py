@@ -105,7 +105,7 @@ def report_comparison(preds, truth, file, epoch):
     labeled_x = labeled_indices[1]
     labeled_y = labeled_indices[0]
     c1 = ax1.imshow(preds)
-    ax1.scatter(labeled_y, labeled_x, marker='o', color='red', alpha=0.5)
+    # ax1.scatter(labeled_y, labeled_x, marker='o', color='red', alpha=0.5)
     fig.colorbar(c1, ax=ax1)
     ax1.set_title(f'Preds, epoch {epoch}')
 
@@ -114,7 +114,7 @@ def report_comparison(preds, truth, file, epoch):
     labeled_x = labeled_indices[1]
     labeled_y = labeled_indices[0]
     c2 = ax2.imshow(truth)
-    ax2.scatter(labeled_y, labeled_x, marker='o', color='red')
+    # ax2.scatter(labeled_y, labeled_x, marker='o', color='red')
     ax2.set_title('Truth')
     fig.colorbar(c2, ax=ax2)
     ax2.set_title('Truth')
