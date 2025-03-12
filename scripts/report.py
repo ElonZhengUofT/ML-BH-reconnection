@@ -444,7 +444,7 @@ if __name__ == '__main__':
                 # 加载对应epoch的预测结果与真实标签
                 data = np.load(
                     os.path.join(args.dir, 'val', str(i), f'{fname}.npz'))
-                preds, truth = data['outputs'], data['labels']
+                preds, truth = data['outputs'], data['label']
                 frame = report_gif_frame(preds, truth, i, xmin, xmax, zmin, zmax)
                 frames.append(frame)
             gif.save(frames, os.path.join(args.dir, 'epochs.gif'), duration=100)

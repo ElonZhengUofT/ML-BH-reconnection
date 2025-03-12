@@ -196,7 +196,7 @@ def evaluate(model, data_loader, device, criterion, outdir, epoch, binary,
                                     file=plot_file, epoch=epoch)
 
                     # 将预测结果和真实标签保存为npz文件
-                    results = {'outputs': preds_np, 'labels': label[n].cpu().numpy(), 'truth': truth_np}
+                    results = {'outputs': preds_np, 'label': label[n].cpu().numpy(), 'truth': truth_np}
                     np.savez(os.path.join(outdir, f'{fname[n]}.npz'), **results)
 
             # 在进度条中显示当前批次的损失和准确率
