@@ -252,7 +252,7 @@ if __name__ == '__main__':
     # arg_parser.add_argument('--rho', action='store_true')
     arg_parser.add_argument('--model', default='ViTUnet', type=str)
     arg_parser.add_argument('--loss', default='focal', type=str)
-    arg_parser.add_argument('--2DG', action='store_true',
+    arg_parser.add_argument('--TwoDG', action='store_true',
                             help='Enable 2D Gaussian label smoothing')
     args = arg_parser.parse_args()
 
@@ -283,7 +283,7 @@ if __name__ == '__main__':
 ################################################################################
     # Enable 2D Gaussian label smoothing
 ################################################################################
-    if args.2DG:
+    if args.TwoDG:
         gaussian = True
     else:
         gaussian = False
