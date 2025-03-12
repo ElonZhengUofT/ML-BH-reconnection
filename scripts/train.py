@@ -331,7 +331,7 @@ if __name__ == '__main__':
             kernel_size=args.kernel_size
         )
 
-    visualize_model(unet, input=torch.randn(1, len(features), args.height, args.width))
+    # visualize_model(unet, input=torch.randn(1, len(features), args.height, args.width))
 
     print("Third Checkpoint")
 
