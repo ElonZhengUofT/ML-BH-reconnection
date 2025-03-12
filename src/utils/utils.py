@@ -72,6 +72,36 @@ def pick_best_threshold_by_f_beta(precision, recall, thresholds, beta):
     return max_f_score, max_f_index, max_f_thresh
 
 
+def pick_best_threshold_by_high_tpr(precision, recall, thresholds, min_precision=1e-3):
+    """
+    选择具有最高 TPR（召回率 TP / (TP + FN)）的阈值，同时保证 Precision >= min_precision。
+
+    参数:
+      precision: 精确率数组
+      recall: 召回率数组
+      thresholds: 阈值数组
+      min_precision: 设定的最小 Precision 阈值，防止过多误报（默认 0.5）
+
+    返回:
+      max_tpr: 最大 Recall（TPR）
+      max_tpr_index: 对应索引
+      best_threshold: 选出的最佳阈值
+    """
+    valid_indices = np.where(precision >= min_precision)[0]  # 过滤掉 Precision < min_precision 的点
+    if len(valid_indices) == 0:
+        # print(f"a minimum precision of {min_precision} is not achievable")
+        max_tpr_index = np.argmax(recall)  # 选择 Recall 最高的点
+    else:
+        max_tpr_index = valid_indices[np.argmax(recall[valid_indices])]  # 在 Precision >= min_precision 的点中选择 Recall 最高的
+
+    max_tpr = recall[max_tpr_index]
+    best_threshold = thresholds[max_tpr_index]
+
+    # print(f"max TPR: {max_tpr}, threshold: {best_threshold}")
+    return max_tpr, max_tpr_index, best_threshold
+
+
+
 def normalize(name, feature, norms):
     """
     根据特征名称对特征进行归一化处理。
