@@ -63,7 +63,7 @@ class NPZDataset(Dataset):
         # 根据二值模式处理标签输出
         if self.binary_mode:
             if self.gaussian_noise:
-                y = gaussianize_image(sample['labels'][np.newaxis, :, :])
+                y = gaussianize_image(sample['labels'])[np.newaxis, :, :]
             else:
                 y = sample['labels'][np.newaxis, :, :]
         else:
