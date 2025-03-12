@@ -15,8 +15,8 @@ from src import *
 from report import report_comparison
 from ptflops import get_model_complexity_info
 import netron
-import torch.onnx
-from torchvision.ops import sigmoid_focal_loss
+import torchvision
+import torchlens as tl
 
 
 def train(model, train_loader, device, criterion, optimizer, scheduler,
@@ -211,21 +211,8 @@ def visualize_model(model, input):
     """
     将模型导出为ONNX格式，并使用Netron进行可视化。
     """
-    device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-    x = input.to(device)
-    modelData = "./demo.pth"
-    torch.onnx.export(
-        model,
-        x,
-        modelData,
-        export_params=True,
-        opset_version=10,
-        do_constant_folding=True,
-        input_names=['input'],
-        output_names=['output'],
-        dynamic_axes={'input': {0: 'batch_size'}, 'output': {0: 'batch_size'}}
-    )
-    netron.start(modelData)
+    model_history = tl.log_forward_pass(model, input,layers_to_save='all', vis_opt='unrolled')
+    print(model_history)
 
 
 if __name__ == '__main__':
@@ -344,7 +331,7 @@ if __name__ == '__main__':
             kernel_size=args.kernel_size
         )
 
-    # visualize_model(unet, input=torch.randn(1, len(features), args.height, args.width))
+    visualize_model(unet, input=torch.randn(1, len(features), args.height, args.width))
 
     print("Third Checkpoint")
 
@@ -394,6 +381,8 @@ if __name__ == '__main__':
         criterion = PosFocusLoss()
     elif args.loss == 'posfocal':
         criterion = PosFocal(gamma=1.5, alpha=0.85)
+    elif args.loss == 'hausdorff':
+        criterion = SoftHausdorffLoss(alpha=5.0)
 
     optimizer = torch.optim.Adam(unet.parameters(), lr=args.learning_rate,
                                  weight_decay=1.e-5)

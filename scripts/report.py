@@ -525,7 +525,6 @@ if __name__ == '__main__':
         report_precision_recall(precision, recall, max_f1_score, max_f1_index,
                                 max_f1_thresh,
                                 max_f2_score, max_f2_index, max_f2_thresh,
-                                max_tpr, max_tpr_index, best_threshold,
                                 side_dir)
         report_thresholds(precision, recall, thresholds, max_f1_thresh,
                           max_f2_thresh, best_threshold,

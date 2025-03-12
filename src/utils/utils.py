@@ -95,6 +95,8 @@ def pick_best_threshold_by_high_tpr(precision, recall, thresholds, min_precision
         max_tpr_index = valid_indices[np.argmax(recall[valid_indices])]  # 在 Precision >= min_precision 的点中选择 Recall 最高的
 
     max_tpr = recall[max_tpr_index]
+    if max_tpr_index >= len(thresholds):
+        max_tpr_index = len(thresholds) - 1
     best_threshold = thresholds[max_tpr_index]
 
     # print(f"max TPR: {max_tpr}, threshold: {best_threshold}")
