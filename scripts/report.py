@@ -461,7 +461,7 @@ if __name__ == '__main__':
     # 遍历所有测试文件，收集预测与真实结果，并保存对比图
     for i, test_file in enumerate(test_list):
         data = np.load(test_file)
-        preds, truth = data['outputs'], data['labels']
+        preds, truth = data['outputs'], data['label']
         if args.modeldir:
             test_plot_file = os.path.join(args.dir, 'test',
                                           Path(test_file).stem)
