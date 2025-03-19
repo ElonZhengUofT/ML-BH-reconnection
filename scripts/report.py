@@ -82,13 +82,14 @@ def report_reconnection_points(file):
 ################################################################################
 # 绘制预测与真实值的对比图
 ################################################################################
-def report_comparison(preds, truth, file, epoch):
+def report_comparison(preds, truth, label, file, epoch):
     """
     绘制预测结果与真实标签的对比图，并保存为文件。
 
     参数:
       preds: 模型预测结果数组
       truth: 真实标签数组
+      label: 原始标签数组（用于提取标记位置）
       file: 保存图像的文件路径
       epoch: 当前训练轮次（用于图像标题）
     """
@@ -101,11 +102,11 @@ def report_comparison(preds, truth, file, epoch):
 
     # Show the prediction results
     # mark groud truth reconnection points with a color won't cover the prediction, make it transparent)
-    labeled_indices = truth.nonzero()
-    labeled_x = labeled_indices[1]
-    labeled_y = labeled_indices[0]
+    labeled_indices = label.nonzero()
+    labeled_x = labeled_indices[0]
+    labeled_y = labeled_indices[1]
     c1 = ax1.imshow(preds)
-    # ax1.scatter(labeled_y, labeled_x, marker='o', color='red', alpha=0.5)
+    ax1.scatter(labeled_y, labeled_x, marker='o', color='red', alpha=0.5)
     fig.colorbar(c1, ax=ax1)
     ax1.set_title(f'Preds, epoch {epoch}')
 
@@ -114,7 +115,7 @@ def report_comparison(preds, truth, file, epoch):
     labeled_x = labeled_indices[1]
     labeled_y = labeled_indices[0]
     c2 = ax2.imshow(truth)
-    # ax2.scatter(labeled_y, labeled_x, marker='o', color='red')
+    ax2.scatter(labeled_y, labeled_x, marker='o', color='red', alpha=0.5)
     ax2.set_title('Truth')
     fig.colorbar(c2, ax=ax2)
     ax2.set_title('Truth')

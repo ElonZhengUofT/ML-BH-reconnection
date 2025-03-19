@@ -191,8 +191,9 @@ def evaluate(model, data_loader, device, criterion, outdir, epoch, binary,
                 for n in range(num_plots):
                     preds_np = outputs[n].detach().cpu().numpy().squeeze()
                     truth_np = truth[n, 0].detach().cpu().numpy().squeeze()
+                    label = label[n, 0].detach().cpu().numpy().squeeze()
                     plot_file = os.path.join(outdir, f'{fname[n]}.png')
-                    report_comparison(preds=preds_np, truth=truth_np,
+                    report_comparison(preds=preds_np, truth=truth_np, label=label,
                                     file=plot_file, epoch=epoch)
 
                     # 将预测结果和真实标签保存为npz文件
