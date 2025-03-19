@@ -16,7 +16,6 @@ from report import report_comparison
 from ptflops import get_model_complexity_info
 import netron
 import torchvision
-import torchlens as tl
 
 
 def train(model, train_loader, device, criterion, optimizer, scheduler,
@@ -209,6 +208,7 @@ def evaluate(model, data_loader, device, criterion, outdir, epoch, binary,
 
 
 def visualize_model(model, input):
+    import torchlens as tl
     """
     将模型导出为ONNX格式，并使用Netron进行可视化。
     """
