@@ -469,6 +469,8 @@ if __name__ == '__main__':
             plot_comparison(preds, truth, test_plot_file,
                             metadata['best_epoch'])
         all_preds[i] = preds
+        print(f'all_truth shape: {all_truth.shape}')
+        print(f'truth shape: {truth.shape}')
         all_truth[i] = truth
 
     # 根据地球中心划分夜侧和日侧数据
