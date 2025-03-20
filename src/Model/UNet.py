@@ -93,7 +93,16 @@ class UNet(nn.Module):
         self.down = Down(down_chs, kernel_size)
         self.bottleneck = Block(down_chs[-1], down_chs[-1], kernel_size)
         self.up = Up(up_chs, kernel_size)
-        self.head = nn.Conv2d(up_chs[-1], num_class, kernel_size=1)
+        # self.head = nn.Conv2d(up_chs[-1], num_class, kernel_size=1)
+        self.head = nn.Sequential(
+            nn.Conv2d(up_chs[-1], 128, kernel_size=1),
+            nn.ReLU(),
+            nn.AdaptiveAvgPool2d((1, 1)),  # 提取全局信息
+            nn.Flatten(),
+            nn.Linear(128, num_class),
+            nn.Unflatten(1, (num_class, 1, 1)),  # 重新变回 (B, C, H, W) 形式
+            nn.Upsample(size=out_sz, mode="bilinear", align_corners=False)
+        )
         if num_class == 1:
             self.sigmoid = nn.Sigmoid()
         else:
