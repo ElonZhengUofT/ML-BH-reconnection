@@ -94,9 +94,7 @@ class UNet(nn.Module):
         self.up = Up(up_chs, kernel_size)
         # self.head = nn.Conv2d(up_chs[-1], num_class, kernel_size=1)
         self.head = nn.Sequential(
-            nn.Conv2d(up_chs[-1], 128, kernel_size=3, padding=1),
-            nn.LeakyReLU(0.1),  # 避免死神经元
-            nn.Conv2d(128, num_class, kernel_size=3, padding=1),  # 让像素保持独立
+            nn.Conv2d(up_chs[-1], num_class, kernel_size=3, padding=1),
             nn.Upsample(size=out_sz, mode="bilinear", align_corners=False)
         )
 
