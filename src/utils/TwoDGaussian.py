@@ -2,7 +2,7 @@ import numpy as np
 from scipy.ndimage import gaussian_filter
 
 
-def gaussianize_image(image, sigma=5):
+def gaussianize_image(image, sigma=15):
     """
     对输入图像应用高斯滤波，将二值标签转化为2D Gaussian热图。
 
