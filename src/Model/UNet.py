@@ -15,7 +15,7 @@ class Block(nn.Module):
             nn.LeakyReLU(inplace=True),
             nn.Conv2d(2 * out_channels, out_channels, kernel_size=kernel_size,padding=0, stride=1),
             nn.BatchNorm2d(2 * out_channels),
-            nn.LeakyReLU(inplace=True),
+            nn.LeakyReLU(inplace=True)
             # nn.Conv2d(2 * out_channels, out_channels, kernel_size=kernel_size,padding=0, stride=1)
             # nn.BatchNorm2d(out_channels),
             # nn.ReLU(inplace=True)
@@ -23,7 +23,6 @@ class Block(nn.Module):
 
     def forward(self, x):
         return self.conv(x)
-        return output
 
 class Down(nn.Module):
     def __init__(self, channels: int, kernel_size: int):
