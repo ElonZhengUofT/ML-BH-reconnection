@@ -1,5 +1,6 @@
 import numpy as np
 import torch
+import torch.nn.functional as F
 
 
 def iou_score(prediction, target):
@@ -170,4 +171,18 @@ def split_data(files, file_fraction, data_splits):
     val_files = files[train_index:val_index]
     test_files = files[val_index:test_index]
     return train_files, val_files, test_files
+
+def gradient_magnitude(bx: torch.Tensor, by: torch.Tensor):
+    # bx, by shape: (B, 1, H, W)
+    sobel_x = torch.tensor([[1, 0, -1], [2, 0, -2], [1, 0, -1]], dtype=bx.dtype, device=bx.device).view(1, 1, 3, 3) / 8.0
+    sobel_y = sobel_x.transpose(2, 3)
+
+    grad_bx_x = F.conv2d(bx, sobel_x, padding=1)
+    grad_bx_y = F.conv2d(bx, sobel_y, padding=1)
+    grad_by_x = F.conv2d(by, sobel_x, padding=1)
+    grad_by_y = F.conv2d(by, sobel_y, padding=1)
+
+    return torch.sqrt(grad_bx_x**2 + grad_bx_y**2 + grad_by_x**2 + grad_by_y**2)
+
+
 
