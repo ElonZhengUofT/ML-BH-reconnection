@@ -34,7 +34,11 @@ class ViTModule(nn.Module):
 
         encoder_layer = nn.TransformerEncoderLayer(d_model=embed_dim, nhead=num_heads)
         self.transformer_encoder = nn.TransformerEncoder(encoder_layer, num_layers=num_layers)
-        self.proj = nn.Linear(embed_dim, in_channels)
+        self.proj = nn.Sequential(
+            nn.Linear(embed_dim, in_channels),
+            nn.BatchNorm2d(in_channels),
+            nn.ReLU(inplace=True)
+        )
 
     def forward(self, x):
         # x: (B, C, H, W)

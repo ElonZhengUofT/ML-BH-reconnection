@@ -46,6 +46,7 @@ class NPZDataset(Dataset):
                 'b': norm_B,
             }
 
+
         # 处理每个指定特征
         processed_features = {}
         for feat in self.feature_list:
@@ -54,6 +55,9 @@ class NPZDataset(Dataset):
                 feat_data = normalize(feat,feat_data,norm_dict)
             elif self.use_standardize:
                 feat_data = standardize(feat_data)
+            elif self.use_bias:
+                if feat.startswith('b'):
+                    feat_data = feat_data + np.mean(feat_data)
             processed_features[feat] = feat_data
 
         # 将各特征堆叠成输入张量X（第一维为特征通道）
@@ -68,7 +72,7 @@ class NPZDataset(Dataset):
                 y_pre = np.swapaxes(y_pre, 0, 1)
                 # y轴对称翻转
                 y_pre = np.flip(y_pre, axis=0)
-                y = 0.5 * gaussianize_image(y_pre)[np.newaxis, :, :] + 0.5 * gaussianize_image(y_pre,sigma=5)[np.newaxis, :, :]
+                y = 0.5 * gaussianize_image(y_pre,sigma=25)[np.newaxis, :, :] + 0.5 * gaussianize_image(y_pre,sigma=5)[np.newaxis, :, :]
                 # scale the blurred image to [0, 1]
                 y = y / np.max(y)
             else:
