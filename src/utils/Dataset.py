@@ -72,7 +72,7 @@ class NPZDataset(Dataset):
                 y_pre = np.swapaxes(y_pre, 0, 1)
                 # y轴对称翻转
                 y_pre = np.flip(y_pre, axis=0)
-                y = 0.5 * gaussianize_image(y_pre,sigma=25)[np.newaxis, :, :] + 0.5 * gaussianize_image(y_pre,sigma=5)[np.newaxis, :, :]
+                y = 0.9 * gaussianize_image(y_pre,sigma=25)[np.newaxis, :, :] + 0.1 * gaussianize_image(y_pre,sigma=5)[np.newaxis, :, :]
                 # scale the blurred image to [0, 1]
                 y = y / np.max(y)
             else:
