@@ -1,0 +1,57 @@
+{
+  "True Positive": 3,
+  "True Negative": 773935,
+  "False Positive": 7297,
+  "False Negative": 15,
+  "Accuracy": 0.99064064,
+  "Precision": 0.00041095890410958907,
+  "Recall/Sensitivity": 0.16666666666666666,
+  "Specificity": 0.9906596247977554,
+  "AUC ROC": 0.5786631457322111,
+  "IoU": 0.0004101161995898838,
+  "F1": {
+    "both_sides": {
+      "score": 0.0008198961464881115,
+      "threshold": 0.02664751559495926
+    },
+    "nightside": {
+      "score": 0.0008198961464881115,
+      "threshold": 0.02664751559495926
+    }
+  },
+  "F2": {
+    "both_sides": {
+      "score": 0.0020347259902333153,
+      "threshold": 0.02664751559495926
+    },
+    "nightside": {
+      "score": 0.0020347259902333153,
+      "threshold": 0.02664751559495926
+    }
+  },
+  "TPR": {},
+  "args": {
+    "indir": "smaller_data",
+    "outdir": "sample/results",
+    "file_fraction": 1.0,
+    "data_splits": [
+      0.6,
+      0.2,
+      0.2
+    ],
+    "epochs": 150,
+    "batch_size": 2,
+    "learning_rate": 1e-05,
+    "num_classes": 1,
+    "kernel_size": 3,
+    "height": 625,
+    "width": 625,
+    "normalize": true,
+    "standardize": true,
+    "gpus": null,
+    "num_workers": 0,
+    "model": "UNet",
+    "loss": "l2",
+    "TwoDG": true
+  }
+}

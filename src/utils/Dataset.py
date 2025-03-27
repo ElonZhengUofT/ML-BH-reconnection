@@ -75,7 +75,9 @@ class NPZDataset(Dataset):
             processed_features['b2'],
             processed_features['b3']
         )
-        processed_features['gradB'] = grad_b
+        grad_b = (grad_b - np.mean(grad_b)) / np.std(grad_b)
+        grad_b_reciprocal = 1 / (grad_b + 1e-8)
+        processed_features['gradB'] = grad_b_reciprocal
 
         # 将各特征堆叠成输入张量X（第一维为特征通道）
         X = np.stack([processed_features[feat] for feat in self.feature_list + ['gradB']],
