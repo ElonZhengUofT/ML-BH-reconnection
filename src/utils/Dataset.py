@@ -78,7 +78,7 @@ class NPZDataset(Dataset):
         processed_features['gradB'] = grad_b
 
         # 将各特征堆叠成输入张量X（第一维为特征通道）
-        X = np.stack([processed_features[feat] for feat in self.feature_list + ['gradB']]],
+        X = np.stack([processed_features[feat] for feat in self.feature_list + ['gradB']],
                      axis=0)
 
         # 根据二值模式处理标签输出
