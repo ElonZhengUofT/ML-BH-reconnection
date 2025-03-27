@@ -338,7 +338,7 @@ if __name__ == '__main__':
 
     # 计算模型复杂度（MACs）和参数数量，并打印出来
     macs, params = get_model_complexity_info(
-        unet, (len(features), args.height, args.width),
+        unet, (len(features) + 1, args.height, args.width), # Temporarily add one channel for the label for gradB, fix code for security one day
         as_strings=True, print_per_layer_stat=True, verbose=True
     )
     print('{:<30}  {:<8}'.format('Computational complexity: ', macs))

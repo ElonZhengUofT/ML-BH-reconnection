@@ -65,9 +65,9 @@ class NPZDataset(Dataset):
                 feat_data = normalize(feat,feat_data,norm_dict)
             elif self.use_standardize:
                 feat_data = standardize(feat_data)
-            elif self.use_bias:
-                if feat.startswith('b'):
-                    feat_data = feat_data + np.mean(feat_data)
+            #elif self.use_bias:
+            #     if feat.startswith('b'):
+            #         feat_data = feat_data + np.mean(feat_data)
             processed_features[feat] = feat_data
 
         grad_b = compute_grad_b(
@@ -78,6 +78,8 @@ class NPZDataset(Dataset):
         processed_features['gradB'] = grad_b
 
         # 将各特征堆叠成输入张量X（第一维为特征通道）
+        X = np.stack([processed_features[feat] for feat in self.feature_list + ['gradB']],
+                     axis=0)
         X = np.stack([processed_features[feat] for feat in self.feature_list + ['gradB']],
                      axis=0)
 
@@ -143,4 +145,7 @@ if __name__ == "__main__":
     import matplotlib.pyplot as plt
     plt.imshow(sample, cmap='gray')
     plt.show()
+
+    X = sample_npz[0]['X']
+    print(X.shape)
 
