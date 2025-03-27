@@ -518,7 +518,18 @@ if __name__ == '__main__':
         binary_preds = np.where(preds < max_f2_thresh, 0, 1)
         report_confusion_matrix(binary_preds, truth, 'f2', side_dir)
 
-#         max_tpr, max_tpr_index, best_threshold = pick_best_threshold_by_high_tpr(
+        # Get the best threshold by the intersection of precision and recall
+        intersection_diff, intersection_index, intersection_thresh = pick_best_threshold_by_intersection(
+            precision, recall, thresholds)
+        intersection = {}  # Dictionary to hold the intersection-based threshold result if needed
+        intersection[side] = {'diff': intersection_diff,
+                              'threshold': intersection_thresh}
+
+        # Generate binary predictions using the intersection-based threshold
+        binary_preds = np.where(preds < intersection_thresh, 0, 1)
+        report_confusion_matrix(binary_preds, truth, 'intersection', side_dir)
+
+        #         max_tpr, max_tpr_index, best_threshold = pick_best_threshold_by_high_tpr(
         #             precision, recall, thresholds, min_precision=1e-6)
         #         tpr[side] = {'score': max_tpr, 'threshold': best_threshold}
         #         binary_preds = np.where(preds < best_threshold, 0, 1)
@@ -565,6 +576,8 @@ if __name__ == '__main__':
     report_confusion_matrix(all_binary_preds.ravel(), all_truth.ravel(),
                             'f2', args.dir)
 
+
+
 #     if 'dayside' in tpr:
     #         binary_preds_tpr_nightside = np.where(
     #             nightside_preds < tpr['nightside']['threshold'], 0, 1)
@@ -580,6 +593,9 @@ if __name__ == '__main__':
     #
     #     report_confusion_matrix(all_binary_preds.ravel(), all_truth.ravel(),
     #                             'tpr', args.dir)
+    ############################################################################
+    #
+    ############################################################################
 
     ############################################################################
     # 绘制ROC曲线，并输出分类指标
@@ -590,6 +606,7 @@ if __name__ == '__main__':
     metrics_dict['F1'] = f1
     metrics_dict['F2'] = f2
     metrics_dict['TPR'] = tpr
+    metrics_dict['Intersection'] = intersection
     print(json.dumps(metrics_dict, indent=2))
     metrics_dict['args'] = metadata['args']
 

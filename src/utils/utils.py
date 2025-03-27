@@ -104,6 +104,36 @@ def pick_best_threshold_by_high_tpr(precision, recall, thresholds, min_precision
     return max_tpr, max_tpr_index, best_threshold
 
 
+def pick_best_threshold_by_intersection(precision, recall, thresholds):
+    """
+    Select the best threshold based on the intersection of the precision and recall curves,
+    i.e. the threshold where the absolute difference between precision and recall is minimized.
+
+    Parameters:
+        precision: 1D array of precision values. Note that its length is usually len(thresholds) + 1.
+        recall: 1D array of recall values. Note that its length is usually len(thresholds) + 1.
+        thresholds: 1D array of threshold values.
+
+    Returns:
+        best_diff: The minimum absolute difference between precision and recall.
+        best_index: The index corresponding to the best threshold in the thresholds array.
+        best_threshold: The threshold at which the minimum difference is achieved.
+    """
+    # Since precision and recall arrays have one more element than thresholds, use only the first len(thresholds) values.
+    prec = precision[:-1]
+    rec = recall[:-1]
+
+    # Calculate the absolute differences between precision and recall.
+    diff = np.abs(prec - rec)
+
+    # Identify the index where this difference is minimized.
+    best_index = np.argmin(diff)
+    best_threshold = thresholds[best_index]
+    best_diff = diff[best_index]
+
+    return best_diff, best_index, best_threshold
+
+
 
 def normalize(name, feature, norms):
     """

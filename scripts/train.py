@@ -324,7 +324,7 @@ if __name__ == '__main__':
 
     if args.model == 'ViTUnet':
         unet = ViTUNet(
-            down_chs=(8, 64, 128),
+            down_chs=(9, 64, 128), # if |\nabla B| is added, in_channels should be 9, otherwise 8
             up_chs=(128, 64),
             num_class=args.num_classes,
             retain_dim=True,

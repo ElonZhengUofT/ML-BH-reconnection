@@ -6,7 +6,17 @@ from torch.utils.data import Dataset
 
 from src.utils.utils import normalize, standardize, euclidian
 from src.utils.TwoDGaussian import gaussianize_image
+from scipy.ndimage import sobel
 
+def compute_grad_b(b1, b2, b3):
+    # 对每个分量求梯度
+    grad_sq = 0
+    for b in [b1, b2, b3]:
+        dx = sobel(b, axis=1, mode='constant')  # x方向（列）
+        dy = sobel(b, axis=0, mode='constant')  # y方向（行）
+        grad_sq += dx**2 + dy**2
+    grad_mag = np.sqrt(grad_sq + 1e-8)
+    return grad_mag.astype(np.float32)
 
 class NPZDataset(Dataset):
     """
@@ -60,8 +70,15 @@ class NPZDataset(Dataset):
                     feat_data = feat_data + np.mean(feat_data)
             processed_features[feat] = feat_data
 
+        grad_b = compute_grad_b(
+            processed_features['b1'],
+            processed_features['b2'],
+            processed_features['b3']
+        )
+        processed_features['gradB'] = grad_b
+
         # 将各特征堆叠成输入张量X（第一维为特征通道）
-        X = np.stack([processed_features[feat] for feat in self.feature_list],
+        X = np.stack([processed_features[feat] for feat in self.feature_list + ['gradB']]],
                      axis=0)
 
         # 根据二值模式处理标签输出
