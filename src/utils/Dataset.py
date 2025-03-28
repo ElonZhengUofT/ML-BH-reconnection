@@ -69,21 +69,24 @@ class NPZDataset(Dataset):
             #     if feat.startswith('b'):
             #         feat_data = feat_data + np.mean(feat_data)
             processed_features[feat] = feat_data
-
-        grad_b = compute_grad_b(
-            processed_features['b1'],
-            processed_features['b2'],
-            processed_features['b3']
-        )
-        grad_b = (grad_b - np.mean(grad_b)) / np.std(grad_b)
-        grad_b_reciprocal = 1 / (grad_b + 1e-8)
-        processed_features['gradB'] = grad_b_reciprocal
+            if feat == 'b3':
+                grad_b = compute_grad_b(
+                    processed_features['b1'],
+                    processed_features['b2'],
+                    processed_features['b3']
+                )
+                grad_b = (grad_b - np.mean(grad_b)) / np.std(grad_b)
+                grad_b_reciprocal = 1 / (grad_b + 1e-8)
+                processed_features['gradB'] = grad_b_reciprocal
 
         # 将各特征堆叠成输入张量X（第一维为特征通道）
-        X = np.stack([processed_features[feat] for feat in self.feature_list + ['gradB']],
-                     axis=0)
-        X = np.stack([processed_features[feat] for feat in self.feature_list + ['gradB']],
-                     axis=0)
+        if processed_features['gradB'] is not None:
+            X = np.stack([processed_features[feat] for feat in
+                          self.feature_list + ['gradB']],
+                         axis=0)
+        else:
+            X = np.stack([processed_features[feat] for feat in self.feature_list],
+                         axis=0)
 
         # 根据二值模式处理标签输出
         if self.binary_mode:

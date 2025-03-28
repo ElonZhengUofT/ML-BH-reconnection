@@ -320,6 +320,56 @@ def report_thresholds(precision, recall, thresholds, max_f1_thresh, max_f2_thres
 
 
 ################################################################################
+# 绘制Precision和Recall曲线 vs 阈值，并标记出交点阈值
+################################################################################
+
+def report_precision_recall_by_threshold(precision, recall, thresholds,
+                                         intersection_index,
+                                         intersection_thresh, outdir):
+    """
+    Plot the Precision and Recall curves versus threshold and highlight the selected intersection threshold.
+
+    Parameters:
+      precision: 1D numpy array of precision values (length = len(thresholds) + 1).
+      recall: 1D numpy array of recall values (length = len(thresholds) + 1).
+      thresholds: 1D numpy array of threshold values.
+      intersection_index: The index corresponding to the chosen intersection threshold in the thresholds array.
+      intersection_thresh: The best threshold value selected by the intersection method.
+      outdir: Directory path where the plot will be saved.
+    """
+    import os
+    import matplotlib.pyplot as plt
+
+    # Since precision and recall arrays are one element longer than thresholds, only consider the first len(thresholds) values.
+    prec = precision[:-1]
+    rec = recall[:-1]
+
+    plt.figure(figsize=(8, 6))
+
+    # Plot the precision and recall curves.
+    plt.plot(thresholds, prec, label='Precision', marker='o')
+    plt.plot(thresholds, rec, label='Recall', marker='o')
+
+    # Highlight the selected intersection threshold with a red marker.
+    plt.scatter([intersection_thresh], [prec[intersection_index]], color='red',
+                s=100, zorder=5,
+                label=f'Intersection Threshold: {intersection_thresh:.4f}')
+
+    plt.xlabel('Threshold')
+    plt.ylabel('Score')
+    plt.title('Precision & Recall vs Threshold')
+    plt.legend()
+    plt.grid(True)
+
+    # Save the plot to the specified output directory.
+    save_path = os.path.join(outdir, 'precision_recall_by_threshold.png')
+    plt.savefig(save_path)
+    plt.close()
+
+    print(f'Plot saved to: {save_path}')
+
+
+################################################################################
 # 绘制混淆矩阵
 ################################################################################
 def report_confusion_matrix(binary_preds, truth, score, outdir):
@@ -543,6 +593,10 @@ if __name__ == '__main__':
         report_thresholds(precision, recall, thresholds, max_f1_thresh,
                           max_f2_thresh,
                           side_dir)
+        report_precision_recall_by_threshold(precision, recall, thresholds,
+                                             intersection_index,
+                                             intersection_thresh,
+                                                side_dir)
 
     if 'dayside' in f1:
         binary_preds_f1_nightside = np.where(

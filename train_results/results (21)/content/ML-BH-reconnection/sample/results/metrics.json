@@ -1,0 +1,63 @@
+{
+  "True Positive": 2,
+  "True Negative": 781173,
+  "False Positive": 59,
+  "False Negative": 16,
+  "Accuracy": 0.999904,
+  "Precision": 0.03278688524590164,
+  "Recall/Sensitivity": 0.1111111111111111,
+  "Specificity": 0.9999244782599791,
+  "AUC ROC": 0.5555177946855452,
+  "IoU": 0.025974025974025976,
+  "F1": {
+    "both_sides": {
+      "score": 0.06451612903225808,
+      "threshold": 0.024803662672638893
+    },
+    "nightside": {
+      "score": 0.06451612903225808,
+      "threshold": 0.024803662672638893
+    }
+  },
+  "F2": {
+    "both_sides": {
+      "score": 0.07518796992481204,
+      "threshold": 0.02220895327627659
+    },
+    "nightside": {
+      "score": 0.07518796992481204,
+      "threshold": 0.02220895327627659
+    }
+  },
+  "TPR": {},
+  "Intersection": {
+    "nightside": {
+      "diff": 0.0,
+      "threshold": 0.02440483309328556
+    }
+  },
+  "args": {
+    "indir": "smaller_data",
+    "outdir": "sample/results",
+    "file_fraction": 1.0,
+    "data_splits": [
+      0.6,
+      0.2,
+      0.2
+    ],
+    "epochs": 150,
+    "batch_size": 2,
+    "learning_rate": 1e-05,
+    "num_classes": 1,
+    "kernel_size": 3,
+    "height": 625,
+    "width": 625,
+    "normalize": true,
+    "standardize": true,
+    "gpus": null,
+    "num_workers": 0,
+    "model": "ViTUnet",
+    "loss": "posfocus",
+    "TwoDG": true
+  }
+}

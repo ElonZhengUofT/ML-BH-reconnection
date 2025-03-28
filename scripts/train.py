@@ -264,7 +264,8 @@ if __name__ == '__main__':
     print(len(test_files), 'test files:', test_files)
 
     # 定义所需特征列表
-    features = ['b1', 'b2', 'b3', 'e1', 'e2', 'e3', 'rho', 'p']
+    # features = ['b1', 'b2', 'b3', 'e1', 'e2', 'e3', 'rho', 'p']
+    features = ['rho', 'p']
     print(len(features), 'features:', features)
 
     binary = args.num_classes == 1
