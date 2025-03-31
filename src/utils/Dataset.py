@@ -80,7 +80,7 @@ class NPZDataset(Dataset):
                 processed_features['gradB'] = grad_b_reciprocal
 
         # 将各特征堆叠成输入张量X（第一维为特征通道）
-        if processed_features['gradB'] is not None:
+        if 'gradB' in processed_features.keys():
             X = np.stack([processed_features[feat] for feat in
                           self.feature_list + ['gradB']],
                          axis=0)

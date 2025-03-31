@@ -323,6 +323,8 @@ if __name__ == '__main__':
             kernel_size=args.kernel_size
         )
 
+    # input_channels = len(train_dataset.feature_list)
+
     if args.model == 'ViTUnet':
         unet = ViTUNet(
             down_chs=(3, 64, 128), # if |\nabla B| is added, in_channels should be 9, otherwise 8
