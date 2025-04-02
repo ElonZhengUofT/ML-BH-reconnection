@@ -213,6 +213,13 @@ def visualize_model(model, input):
     将模型导出为ONNX格式，并使用Netron进行可视化。
     """
     model_history = tl.log_forward_pass(model, input,layers_to_save='all', vis_opt='unrolled')
+    tl.visualize_model(
+        model_history,
+        output_file=output_file,
+        vis_opt='unrolled',
+        rankdir='LR',           # 👈 横向图关键设置
+        show_meta=True          # 显示shape等信息（可选）
+    )
     print(model_history)
 
 
@@ -315,7 +322,7 @@ if __name__ == '__main__':
 
     if args.model == 'UNet':
         unet = UNet(
-            down_chs=(8, 64, 128),
+            down_chs=(2, 64, 128),
             up_chs=(128, 64),
             num_class=args.num_classes,
             retain_dim=True,

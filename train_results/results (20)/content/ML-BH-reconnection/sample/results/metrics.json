@@ -30,6 +30,12 @@
     }
   },
   "TPR": {},
+  "Intersection": {
+    "nightside": {
+      "diff": 0.0,
+      "threshold": 0.03346000611782074
+    }
+  },
   "args": {
     "indir": "smaller_data",
     "outdir": "sample/results",

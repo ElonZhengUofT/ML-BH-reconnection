@@ -168,7 +168,7 @@ def report_gif_frame(preds, truth, epoch, xmin, xmax, zmin, zmax):
       epoch: 当前训练轮次
       xmin, xmax, zmin, zmax: 图像的坐标范围
     """
-    fig = plt.figure(figsize=(5, 3), dpi=100)
+    fig = plt.figure(figsize=(10, 6), dpi=300)
 
     # 构造x和z坐标轴
     xx = np.linspace(xmin, xmax, truth.shape[1])
@@ -181,9 +181,13 @@ def report_gif_frame(preds, truth, epoch, xmin, xmax, zmin, zmax):
 
     ax = fig.add_subplot()
     c = ax.imshow(preds, extent=[xmin, xmax, zmin, zmax])
+    # color bar
+    fig.colorbar(c, ax=ax, shrink=0.3)
+    # mark the reconnection points with red circles
+    ax.scatter(labeled_x, labeled_z, marker='o', color='red', alpha=0.3)
     ax.set_title(f'Epoch {epoch}')
     ax.set_xlabel('x/Re')
-    ax.set_ylabel('z/Re')
+    ax.set_ylabel('y/Re')
     plt.tight_layout()
     # 返回当前帧
     return fig
@@ -454,7 +458,12 @@ if __name__ == '__main__':
     # 绘制各向异性图及重连点
     ############################################################################
     # 这里使用一个示例数据文件 'sample/data/3600.npz'
-    earth_center_x, xmin, xmax, zmin, zmax = report_reconnection_points('smaller_data/data_time_0032_smaller.npz')
+    # if the following file is founded
+    if os.path.exists('smaller_data/data_time_0032_smaller.npz'):
+        earth_center_x, xmin, xmax, zmin, zmax = report_reconnection_points('smaller_data/data_time_0032_smaller.npz')
+    elif os.path.exists('/Users/zhengshizhao/PycharmProjects/ML-BH-reconnection/smaller_data/data_time_0032_smaller.npz'):
+        earth_center_x, xmin, xmax, zmin, zmax = report_reconnection_points('/Users/zhengshizhao/PycharmProjects/ML-BH-reconnection/smaller_data/data_time_0032_smaller.npz')
+
 
 
     ############################################################################
@@ -498,7 +507,7 @@ if __name__ == '__main__':
                 preds, truth = data['outputs'], data['label']
                 frame = report_gif_frame(preds, truth, i, xmin, xmax, zmin, zmax)
                 frames.append(frame)
-            gif.save(frames, os.path.join(args.dir, 'epochs.gif'), duration=100)
+            gif.save(frames, os.path.join(args.dir, 'epochs.gif'), duration=200)
 
     ############################################################################
     # 处理测试集预测结果
