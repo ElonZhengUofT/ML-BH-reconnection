@@ -315,9 +315,8 @@ if __name__ == '__main__':
     # Choose the model based on the argument
 ################################################################################
     en_ch = len(feature_list) # 8 for 8 features, 9 for 9 features
-    print(en_ch)
     unet = ViTUNet(
-        down_chs=(8, 64, 128),
+        down_chs=(en_ch, 64, 128),
         up_chs=(128, 64),
         num_class=args.num_classes,
         retain_dim=True,
