@@ -42,7 +42,7 @@ class NPZDataset(Dataset):
         self.grad_b_on = grad_b_on
         self.feature_list = feature_list.copy()
         if self.grad_b_on:
-            self._in_feature_list.append('gradB')
+            self.feature_list.append('gradB')
 
     def __len__(self):
         return len(self.npz_paths)
