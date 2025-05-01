@@ -25,7 +25,7 @@ class NPZDataset(Dataset):
     """
 
     def __init__(self, npz_paths, feature_list, use_normalize, use_standardize,
-                 binary_mode, gaussian_noise):
+                 binary_mode, gaussian_noise, grad_b=True):
         """
         :param npz_paths: NPZ文件的路径列表
         :param feature_list: 需要加载的特征名称列表
@@ -69,7 +69,7 @@ class NPZDataset(Dataset):
             #     if feat.startswith('b'):
             #         feat_data = feat_data + np.mean(feat_data)
             processed_features[feat] = feat_data
-            if feat == 'b3':
+            if feat == 'b3' and grad_b:
                 grad_b = compute_grad_b(
                     processed_features['b1'],
                     processed_features['b2'],

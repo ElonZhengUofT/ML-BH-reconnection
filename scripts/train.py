@@ -212,14 +212,7 @@ def visualize_model(model, input):
     """
     将模型导出为ONNX格式，并使用Netron进行可视化。
     """
-    model_history = tl.log_forward_pass(model, input,layers_to_save='all', vis_opt='unrolled')
-    tl.visualize_model(
-        model_history,
-        output_file=output_file,
-        vis_opt='unrolled',
-        rankdir='LR',           # 👈 横向图关键设置
-        show_meta=True          # 显示shape等信息（可选）
-    )
+    model_history = tl.log_forward_pass(model, input,layers_to_save='all', vis_opt='rolled')
     print(model_history)
 
 
@@ -251,6 +244,8 @@ if __name__ == '__main__':
     arg_parser.add_argument('--loss', default='focal', type=str)
     arg_parser.add_argument('--TwoDG', action='store_true',
                             help='Enable 2D Gaussian label smoothing')
+    arg_parser.add_argument('--gradB', action='store_true',
+                            help='Enable gradient of B field')
     args = arg_parser.parse_args()
 
     # 确保输出目录存在
@@ -271,8 +266,8 @@ if __name__ == '__main__':
     print(len(test_files), 'test files:', test_files)
 
     # 定义所需特征列表
-    # features = ['b1', 'b2', 'b3', 'e1', 'e2', 'e3', 'rho', 'p']
-    features = ['rho', 'p']
+    features = ['b1', 'b2', 'b3', 'e1', 'e2', 'e3', 'rho', 'p']
+    # features = ['rho', 'p']
     print(len(features), 'features:', features)
 
     binary = args.num_classes == 1
@@ -286,27 +281,35 @@ if __name__ == '__main__':
     else:
         gaussian = False
 
+    if args.gradB:
+        gradB = True
+    else:
+        gradB = False
+
+
     # 初始化训练、验证和测试数据集及其加载器
     train_dataset = NPZDataset(train_files, features, args.normalize,
-                               args.standardize, binary, gaussian)
+                               args.standardize, binary, gaussian, gradB)
     train_loader = torch.utils.data.DataLoader(train_dataset,
                                                batch_size=args.batch_size,
                                                drop_last=True,
                                                num_workers=args.num_workers)
 
     val_dataset = NPZDataset(val_files, features, args.normalize,
-                             args.standardize, binary, gaussian)
+                             args.standardize, binary, gaussian, gradB)
     val_loader = torch.utils.data.DataLoader(val_dataset,
                                              batch_size=args.batch_size,
                                              drop_last=False,
                                              num_workers=args.num_workers)
 
     test_dataset = NPZDataset(test_files, features, args.normalize,
-                              args.standardize, binary, gaussian)
+                              args.standardize, binary, gaussian, gradB)
     test_loader = torch.utils.data.DataLoader(test_dataset,
                                               batch_size=args.batch_size,
                                               drop_last=False,
                                               num_workers=args.num_workers)
+
+    feature_list = train_dataset.feature_list
 
 ################################################################################
     # Choose the model based on the argument
@@ -342,7 +345,7 @@ if __name__ == '__main__':
             kernel_size=args.kernel_size
         )
 
-    # visualize_model(unet, input=torch.randn(1, len(features), args.height, args.width))
+    visualize_model(unet, input=torch.randn(1, len(features), args.height, args.width))
 
     print("Third Checkpoint")
 
@@ -424,7 +427,7 @@ if __name__ == '__main__':
     # 将所有元数据写入metadata.json文件
     metadata = {
         'args': vars(args),
-        'features': features,
+        'features': feature_list,
         'train_losses': train_losses,
         'val_losses': val_losses,
         'test_loss': test_loss,
