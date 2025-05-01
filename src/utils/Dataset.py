@@ -39,6 +39,7 @@ class NPZDataset(Dataset):
         self.use_standardize = use_standardize
         self.binary_mode = binary_mode
         self.gaussian_noise = gaussian_noise
+        self.grad_b_on = grad_b_on
 
     def __len__(self):
         return len(self.npz_paths)
@@ -69,7 +70,7 @@ class NPZDataset(Dataset):
             #     if feat.startswith('b'):
             #         feat_data = feat_data + np.mean(feat_data)
             processed_features[feat] = feat_data
-            if feat == 'b3' and grad_b_on:
+            if feat == 'b3' and self.grad_b_on:
                 grad_b = compute_grad_b(
                     processed_features['b1'],
                     processed_features['b2'],
