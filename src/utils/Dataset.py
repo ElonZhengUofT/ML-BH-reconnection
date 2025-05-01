@@ -34,12 +34,13 @@ class NPZDataset(Dataset):
         :param binary_mode: 是否以二值方式输出标签
         """
         self.npz_paths = npz_paths
-        self.feature_list = feature_list
+        self._in_feature_list = feature_list.copy()
         self.use_normalize = use_normalize
         self.use_standardize = use_standardize
         self.binary_mode = binary_mode
         self.gaussian_noise = gaussian_noise
         self.grad_b_on = grad_b_on
+        self.feature_list = feature_list.copy()
 
     def __len__(self):
         return len(self.npz_paths)
@@ -60,7 +61,7 @@ class NPZDataset(Dataset):
 
         # 处理每个指定特征
         processed_features = {}
-        for feat in self.feature_list:
+        for feat in self._in_feature_list:
             feat_data = sample[feat].copy()
             if self.use_normalize:
                 feat_data = normalize(feat,feat_data,norm_dict)
@@ -83,12 +84,12 @@ class NPZDataset(Dataset):
         # 将各特征堆叠成输入张量X（第一维为特征通道）
         if 'gradB' in processed_features.keys():
             X = np.stack([processed_features[feat] for feat in
-                          self.feature_list + ['gradB']],
+                          self._in_feature_list + ['gradB']],
                          axis=0)
             print(f"gradB is added")
             self.feature_list.append('gradB')
         else:
-            X = np.stack([processed_features[feat] for feat in self.feature_list],
+            X = np.stack([processed_features[feat] for feat in self._in_feature_list],
                          axis=0)
 
         # 根据二值模式处理标签输出
