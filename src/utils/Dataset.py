@@ -85,6 +85,7 @@ class NPZDataset(Dataset):
             X = np.stack([processed_features[feat] for feat in
                           self.feature_list + ['gradB']],
                          axis=0)
+            print(f"gradB is added")
         else:
             X = np.stack([processed_features[feat] for feat in self.feature_list],
                          axis=0)
