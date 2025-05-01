@@ -351,7 +351,7 @@ if __name__ == '__main__':
     print("Third Checkpoint")
 
     macs, params = get_model_complexity_info(
-        unet, (len(features), args.height, args.width), # Temporarily add one channel for the label for gradB, fix code for security one day
+        unet, (en_ch, args.height, args.width), # Temporarily add one channel for the label for gradB, fix code for security one day
         as_strings=True, print_per_layer_stat=True, verbose=True
     )
     print('{:<30}  {:<8}'.format('Computational complexity: ', macs))
