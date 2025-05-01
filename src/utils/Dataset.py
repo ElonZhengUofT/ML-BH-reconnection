@@ -41,6 +41,8 @@ class NPZDataset(Dataset):
         self.gaussian_noise = gaussian_noise
         self.grad_b_on = grad_b_on
         self.feature_list = feature_list.copy()
+        if self.grad_b_on:
+            self._in_feature_list.append('gradB')
 
     def __len__(self):
         return len(self.npz_paths)
@@ -87,8 +89,6 @@ class NPZDataset(Dataset):
                           self._in_feature_list + ['gradB']],
                          axis=0)
             print(f"gradB is added")
-            self.feature_list.append('gradB')
-            print(f"feature_list is {self.feature_list} with {len(self.feature_list)} features")
         else:
             X = np.stack([processed_features[feat] for feat in self._in_feature_list],
                          axis=0)
@@ -133,7 +133,8 @@ if __name__ == "__main__":
     use_standardize = False
     binary_mode = True
     gaussian_noise = False
-    sample_npz = NPZDataset(npz_paths, feature_list, use_normalize, use_standardize, binary_mode, gaussian_noise)
+    sample_npz = NPZDataset(npz_paths, feature_list, use_normalize, use_standardize, binary_mode, gaussian_noise, grad_b_on=True)
+    print(f"number of features: {len(sample_npz.feature_list)}")
     # 在图像中央设置一个目标点
     sample = sample_npz[0]['y'][0].numpy()
 
