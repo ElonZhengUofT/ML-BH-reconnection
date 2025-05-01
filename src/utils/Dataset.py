@@ -56,13 +56,6 @@ class NPZDataset(Dataset):
                 'e': norm_E,
                 'b': norm_B,
             }
-        if self.grad_b_on:
-            # 计算梯度
-            grad_b = compute_grad_b(sample['b1'], sample['b2'], sample['b3'])
-            grad_b = (grad_b - np.mean(grad_b)) / np.std(grad_b)
-            grad_b_reciprocal = 1 / (grad_b + 1e-8)
-            sample['gradB'] = grad_b_reciprocal
-            self.feature_list.append('gradB')
 
 
         # 处理每个指定特征
@@ -76,23 +69,25 @@ class NPZDataset(Dataset):
             #elif self.use_bias:
             #     if feat.startswith('b'):
             #         feat_data = feat_data + np.mean(feat_data)
-            #             processed_features[feat] = feat_data
-            #             if feat == 'b3' and self.grad_b_on:
-            #                 grad_b = compute_grad_b(
-            #                     processed_features['b1'],
-            #                     processed_features['b2'],
-            #                     processed_features['b3']
-            #                 )
-            #                 grad_b = (grad_b - np.mean(grad_b)) / np.std(grad_b)
-            #                 grad_b_reciprocal = 1 / (grad_b + 1e-8)
-            #                 processed_features['gradB'] = grad_b_reciprocal
+            processed_features[feat] = feat_data
+            if feat == 'b3' and self.grad_b_on:
+                grad_b = compute_grad_b(
+                    processed_features['b1'],
+                    processed_features['b2'],
+                    processed_features['b3']
+                )
+                grad_b = (grad_b - np.mean(grad_b)) / np.std(grad_b)
+                grad_b_reciprocal = 1 / (grad_b + 1e-8)
+                processed_features['gradB'] = grad_b_reciprocal
 
         # 将各特征堆叠成输入张量X（第一维为特征通道）
-            #         if 'gradB' in processed_features.keys():
-            #             X = np.stack([processed_features[feat] for feat in
-            #                           self.feature_list + ['gradB']],
-            #                          axis=0)
-            #         else:
+        if 'gradB' in processed_features.keys():
+            X = np.stack([processed_features[feat] for feat in
+                          self.feature_list + ['gradB']],
+                         axis=0)
+            print(f"gradB is added")
+            self.feature_list.append('gradB')
+        else:
             X = np.stack([processed_features[feat] for feat in self.feature_list],
                          axis=0)
 
